@@ -1,0 +1,21 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    nacos:
+      discovery:
+        # Nacos 地址，按实际环境调整（现有 MySQL/Redis 在 192.168.100.101）
+        server-addr: 192.168.100.101:8848
+    gateway:
+      routes:
+        - id: web-admin
+          uri: lb://web-admin
+          predicates:
+            - Path=/admin/**
+        - id: web-app
+          uri: lb://web-app
+          predicates:
+            - Path=/app/**
