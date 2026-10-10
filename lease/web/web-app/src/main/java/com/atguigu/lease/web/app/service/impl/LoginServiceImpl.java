@@ -1,18 +1,18 @@
 package com.atguigu.lease.web.app.service.impl;
 
+import com.atguigu.lease.api.user.UserInfoClient;
 import com.atguigu.lease.common.constant.RedisConstant;
 import com.atguigu.lease.common.exception.LeaseException;
+import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.common.result.ResultCodeEnum;
 import com.atguigu.lease.common.utils.CodeUtil;
 import com.atguigu.lease.common.utils.JwtUtil;
 import com.atguigu.lease.model.entity.UserInfo;
 import com.atguigu.lease.model.enums.BaseStatus;
-import com.atguigu.lease.web.app.mapper.UserInfoMapper;
 import com.atguigu.lease.web.app.service.LoginService;
 import com.atguigu.lease.web.app.service.SmsService;
 import com.atguigu.lease.web.app.vo.user.LoginVo;
 import com.atguigu.lease.web.app.vo.user.UserInfoVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class LoginServiceImpl implements LoginService {
     private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
-    private UserInfoMapper userInfoMapper;
+    private UserInfoClient userInfoClient;
 
     @Override
     public void getCode(String phone) {
@@ -64,32 +64,29 @@ public class LoginServiceImpl implements LoginService {
             throw new LeaseException(ResultCodeEnum.APP_LOGIN_CODE_ERROR);
         }
 
-        LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<UserInfo>();
-        queryWrapper.eq(UserInfo::getPhone,loginVo.getPhone());
-        UserInfo userInfo = userInfoMapper.selectOne(queryWrapper);
+        Result<UserInfo> result = userInfoClient.getByPhone(loginVo.getPhone());
+        UserInfo userInfo = result.getData();
         if(userInfo==null){
             //注册用户
             userInfo = new UserInfo();
             userInfo.setPhone(loginVo.getPhone());
             userInfo.setStatus(BaseStatus.ENABLE);
             userInfo.setNickname("用户-"+loginVo.getPhone().substring(7));
-            userInfoMapper.insert(userInfo);
-
+            userInfo = userInfoClient.register(userInfo).getData();
         }else{
             //判断是否被禁用
             if(userInfo.getStatus()==BaseStatus.DISABLE){
                 throw new LeaseException(ResultCodeEnum.APP_ACCOUNT_DISABLED_ERROR);
             }
-
         }
         return JwtUtil.createToken(userInfo.getId(),userInfo.getPhone());
     }
 
     @Override
     public UserInfoVo getLoginUserInfoById(Long userId) {
-        UserInfo info = userInfoMapper.selectById(userId);
+        Result<UserInfo> result = userInfoClient.getUserInfo(userId);
+        UserInfo info = result.getData();
         UserInfoVo userInfoVo = new UserInfoVo(info.getNickname(), info.getAvatarUrl());
         return userInfoVo;
     }
 }
-

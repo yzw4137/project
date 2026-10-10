@@ -1,131 +1,86 @@
 package com.atguigu.lease.web.app.service.impl;
 
-import com.atguigu.lease.common.constant.RedisConstant;
-import com.atguigu.lease.common.login.LoginUserHolder;
-import com.atguigu.lease.model.entity.*;
-import com.atguigu.lease.model.enums.ItemType;
-import com.atguigu.lease.web.app.mapper.*;
-import com.atguigu.lease.web.app.service.ApartmentInfoService;
-import com.atguigu.lease.web.app.service.BrowsingHistoryService;
+import com.atguigu.lease.api.apartment.RoomClient;
+import com.atguigu.lease.common.result.Result;
+import com.atguigu.lease.model.entity.RoomInfo;
+import com.atguigu.lease.model.vo.room.AppRoomDetailVo;
+import com.atguigu.lease.model.vo.room.AppRoomItemVo;
+import com.atguigu.lease.model.vo.room.AppRoomQueryVo;
 import com.atguigu.lease.web.app.service.RoomInfoService;
-import com.atguigu.lease.web.app.vo.apartment.ApartmentItemVo;
-import com.atguigu.lease.web.app.vo.attr.AttrValueVo;
-import com.atguigu.lease.web.app.vo.fee.FeeValueVo;
-import com.atguigu.lease.web.app.vo.graph.GraphVo;
-import com.atguigu.lease.web.app.vo.room.RoomDetailVo;
-import com.atguigu.lease.web.app.vo.room.RoomItemVo;
-import com.atguigu.lease.web.app.vo.room.RoomQueryVo;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
-/**
- * @author liubo
- * @description 针对表【room_info(房间信息表)】的数据库操作Service实现
- * @createDate 2023-07-26 11:12:39
- */
 @Service
-@Slf4j
-public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo>
-        implements RoomInfoService {
+public class RoomInfoServiceImpl implements RoomInfoService {
 
     @Autowired
-    private RoomInfoMapper roomInfoMapper;
+    private RoomClient roomClient;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
-    private GraphInfoMapper graphInfoMapper;
-    @Autowired
-    private LeaseTermMapper leaseTermMapper;
-    @Autowired
-    private FacilityInfoMapper facilityInfoMapper;
-    @Autowired
-    private LabelInfoMapper labelInfoMapper;
-    @Autowired
-    private PaymentTypeMapper paymentTypeMapper;
-    @Autowired
-    private AttrValueMapper attrValueMapper;
-    @Autowired
-    private FeeValueMapper feeValueMapper;
-    @Autowired
-    private ApartmentInfoService apartmentInfoService;
-    @Autowired
-    private BrowsingHistoryService browsingHistoryService;
     @Override
-    public IPage<RoomItemVo> pageItem(Page<RoomItemVo> page, RoomQueryVo queryVo) {
-
-        return roomInfoMapper.pageItem(page, queryVo);
+    public IPage<AppRoomItemVo> pageItem(Page<AppRoomItemVo> page, AppRoomQueryVo queryVo) {
+        Result<IPage<AppRoomItemVo>> result =
+                roomClient.pageAppItem(page.getCurrent(), page.getSize(), queryVo);
+        return result.getData();
     }
 
     @Override
-    public IPage<RoomItemVo> pageItemByApartmentId(Page<RoomItemVo> page, Long id) {
-        return roomInfoMapper.pageItemByApartmentId(page, id);
+    public IPage<AppRoomItemVo> pageItemByApartmentId(Page<AppRoomItemVo> page, Long id) {
+        Result<IPage<AppRoomItemVo>> result =
+                roomClient.pageAppItemByApartmentId(page.getCurrent(), page.getSize(), id);
+        return result.getData();
     }
 
     @Override
-    public RoomDetailVo getDetailById(Long id) {
+    public AppRoomDetailVo getDetailById(Long id) {
+        return roomClient.getAppDetailById(id).getData();
+    }
 
-        String key = RedisConstant.APP_ROOM_PREFIX + id;
-        RoomDetailVo roomDetailVo = (RoomDetailVo) redisTemplate.opsForValue().get(key);
+    @Override
+    public BaseMapper<RoomInfo> getBaseMapper() {
+        return null;
+    }
 
-        if (roomDetailVo == null) {
-            //1.查询房间信息
-            RoomInfo roomInfo = roomInfoMapper.selectById(id);
-            if (roomInfo == null) {
-                return null;
-            }
-            //2.查询图片
-            List<GraphVo> graphVoList = graphInfoMapper.selectListByItemTypeAndId(ItemType.ROOM, id);
-            //3.查询租期
-            List<LeaseTerm> leaseTermList = leaseTermMapper.selectListByRoomId(id);
-            //4.查询配套
-            List<FacilityInfo> facilityInfoList = facilityInfoMapper.selectListByRoomId(id);
-            //5.查询标签
-            List<LabelInfo> labelInfoList = labelInfoMapper.selectListByRoomId(id);
-            //6.查询支付方式
-            List<PaymentType> paymentTypeList = paymentTypeMapper.selectListByRoomId(id);
-            //7.查询基本属性
-            List<AttrValueVo> attrValueVoList = attrValueMapper.selectListByRoomId(id);
-            //8.查询杂费信息
-            List<FeeValueVo> feeValueVoList = feeValueMapper.selectListByApartmentId(roomInfo.getApartmentId());
-            //9.查询公寓信息
-            ApartmentItemVo apartmentItemVo = apartmentInfoService.selectApartmentItemVoById(roomInfo.getApartmentId());
+    @Override
+    public Class<RoomInfo> getEntityClass() {
+        return RoomInfo.class;
+    }
 
-            roomDetailVo = new RoomDetailVo();
-            BeanUtils.copyProperties(roomInfo, roomDetailVo);
+    @Override
+    public boolean saveBatch(java.util.Collection<RoomInfo> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
 
-            roomDetailVo.setApartmentItemVo(apartmentItemVo);
-            roomDetailVo.setGraphVoList(graphVoList);
-            roomDetailVo.setAttrValueVoList(attrValueVoList);
-            roomDetailVo.setFacilityInfoList(facilityInfoList);
-            roomDetailVo.setLabelInfoList(labelInfoList);
-            roomDetailVo.setPaymentTypeList(paymentTypeList);
-            roomDetailVo.setFeeValueVoList(feeValueVoList);
-            roomDetailVo.setLeaseTermList(leaseTermList);
+    @Override
+    public boolean saveOrUpdateBatch(java.util.Collection<RoomInfo> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
 
-            System.out.println("获取房间详情-"+Thread.currentThread().getName());
-            redisTemplate.opsForValue().set(key, roomDetailVo);
-        }
+    @Override
+    public boolean updateBatchById(java.util.Collection<RoomInfo> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
 
+    @Override
+    public boolean saveOrUpdate(RoomInfo entity) {
+        throw new UnsupportedOperationException();
+    }
 
+    @Override
+    public RoomInfo getOne(Wrapper<RoomInfo> queryWrapper, boolean throwEx) {
+        throw new UnsupportedOperationException();
+    }
 
-        //保存浏览历史
-        browsingHistoryService.saveHistory(LoginUserHolder.getLoginUser().getUserId(), id);
+    @Override
+    public java.util.Map<String, Object> getMap(Wrapper<RoomInfo> queryWrapper) {
+        throw new UnsupportedOperationException();
+    }
 
-
-        return roomDetailVo;
+    @Override
+    public <V> V getObj(Wrapper<RoomInfo> queryWrapper, java.util.function.Function<? super Object, V> mapper) {
+        throw new UnsupportedOperationException();
     }
 }
-
-
-
-

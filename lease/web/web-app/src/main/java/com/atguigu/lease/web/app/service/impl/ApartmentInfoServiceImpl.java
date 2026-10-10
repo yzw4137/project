@@ -1,60 +1,80 @@
 package com.atguigu.lease.web.app.service.impl;
 
+import com.atguigu.lease.api.apartment.ApartmentClient;
 import com.atguigu.lease.model.entity.ApartmentInfo;
-import com.atguigu.lease.model.entity.LabelInfo;
-import com.atguigu.lease.model.enums.ItemType;
-import com.atguigu.lease.web.app.mapper.ApartmentInfoMapper;
-import com.atguigu.lease.web.app.mapper.GraphInfoMapper;
-import com.atguigu.lease.web.app.mapper.LabelInfoMapper;
-import com.atguigu.lease.web.app.mapper.RoomInfoMapper;
+import com.atguigu.lease.model.vo.apartment.AppApartmentDetailVo;
+import com.atguigu.lease.model.vo.apartment.AppApartmentItemVo;
 import com.atguigu.lease.web.app.service.ApartmentInfoService;
-import com.atguigu.lease.web.app.vo.apartment.ApartmentItemVo;
-import com.atguigu.lease.web.app.vo.graph.GraphVo;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-/**
- * @author liubo
- * @description 针对表【apartment_info(公寓信息表)】的数据库操作Service实现
- * @createDate 2023-07-26 11:12:39
- */
 @Service
-public class ApartmentInfoServiceImpl extends ServiceImpl<ApartmentInfoMapper, ApartmentInfo>
-        implements ApartmentInfoService {
+public class ApartmentInfoServiceImpl implements ApartmentInfoService {
 
     @Autowired
-    private ApartmentInfoMapper apartmentInfoMapper;
-    @Autowired
-    private LabelInfoMapper labelInfoMapper;
-    @Autowired
-    private GraphInfoMapper graphInfoMapper;
-    @Autowired
-    private RoomInfoMapper roomInfoMapper;
+    private ApartmentClient apartmentClient;
+
     @Override
-    public ApartmentItemVo selectApartmentItemVoById(Long apartmentId) {
-        ApartmentInfo apartmentInfo = apartmentInfoMapper.selectById(apartmentId);
+    public AppApartmentItemVo selectApartmentItemVoById(Long apartmentId) {
+        AppApartmentDetailVo src = apartmentClient.getAppDetailById(apartmentId).getData();
+        if (src == null) {
+            return null;
+        }
+        AppApartmentItemVo dst = new AppApartmentItemVo();
+        BeanUtils.copyProperties(src, dst);
+        dst.setMinRent(src.getMinRent());
+        return dst;
+    }
 
-        List<LabelInfo> labelInfoList = labelInfoMapper.selectListByApartmentId(apartmentId);
+    public AppApartmentDetailVo getDetailById(Long id) {
+        return apartmentClient.getAppDetailById(id).getData();
+    }
 
-        List<GraphVo> graphVoList = graphInfoMapper.selectListByItemTypeAndId(ItemType.APARTMENT, apartmentId);
+    @Override
+    public BaseMapper<ApartmentInfo> getBaseMapper() {
+        return null;
+    }
 
-        BigDecimal minRent = roomInfoMapper.selectMinRentByApartmentId(apartmentId);
+    @Override
+    public Class<ApartmentInfo> getEntityClass() {
+        return ApartmentInfo.class;
+    }
 
-        ApartmentItemVo apartmentItemVo = new ApartmentItemVo();
-        BeanUtils.copyProperties(apartmentInfo, apartmentItemVo);
+    @Override
+    public boolean saveBatch(java.util.Collection<ApartmentInfo> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
 
-        apartmentItemVo.setGraphVoList(graphVoList);
-        apartmentItemVo.setLabelInfoList(labelInfoList);
-        apartmentItemVo.setMinRent(minRent);
-        return apartmentItemVo;
+    @Override
+    public boolean saveOrUpdateBatch(java.util.Collection<ApartmentInfo> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateBatchById(java.util.Collection<ApartmentInfo> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean saveOrUpdate(ApartmentInfo entity) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ApartmentInfo getOne(Wrapper<ApartmentInfo> queryWrapper, boolean throwEx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public java.util.Map<String, Object> getMap(Wrapper<ApartmentInfo> queryWrapper) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <V> V getObj(Wrapper<ApartmentInfo> queryWrapper, java.util.function.Function<? super Object, V> mapper) {
+        throw new UnsupportedOperationException();
     }
 }
-
-
-
-

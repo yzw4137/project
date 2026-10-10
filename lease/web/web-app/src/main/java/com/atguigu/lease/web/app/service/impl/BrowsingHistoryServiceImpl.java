@@ -1,51 +1,79 @@
 package com.atguigu.lease.web.app.service.impl;
 
+import com.atguigu.lease.api.user.BrowsingHistoryClient;
+import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.BrowsingHistory;
-import com.atguigu.lease.web.app.mapper.BrowsingHistoryMapper;
+import com.atguigu.lease.model.vo.history.HistoryItemVo;
 import com.atguigu.lease.web.app.service.BrowsingHistoryService;
-import com.atguigu.lease.web.app.vo.history.HistoryItemVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-
-/**
- * @author liubo
- * @description 针对表【browsing_history(浏览历史)】的数据库操作Service实现
- * @createDate 2023-07-26 11:12:39
- */
 @Service
-public class BrowsingHistoryServiceImpl extends ServiceImpl<BrowsingHistoryMapper, BrowsingHistory>
-        implements BrowsingHistoryService {
+public class BrowsingHistoryServiceImpl implements BrowsingHistoryService {
 
     @Autowired
-    private BrowsingHistoryMapper browsingHistoryMapper;
+    private BrowsingHistoryClient browsingHistoryClient;
+
     @Override
     public IPage<HistoryItemVo> pageItemByUserId(Page<HistoryItemVo> page, Long userId) {
-        return browsingHistoryMapper.pageItemByUserId(page, userId);
+        Result<IPage<HistoryItemVo>> result =
+                browsingHistoryClient.pageItem(page.getCurrent(), page.getSize(), userId);
+        return result.getData();
     }
 
     @Override
     @Async
     public void saveHistory(Long userId, Long id) {
-        LambdaQueryWrapper<BrowsingHistory> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(BrowsingHistory::getUserId, userId)
-                .eq(BrowsingHistory::getRoomId, id);
-        BrowsingHistory browsingHistory = browsingHistoryMapper.selectOne(wrapper);
-        if(browsingHistory != null){
-            browsingHistory.setBrowseTime(new Date());
-            browsingHistoryMapper.updateById(browsingHistory);
-        }else{
-            browsingHistory = new BrowsingHistory();
-            browsingHistory.setUserId(userId);
-            browsingHistory.setRoomId(id);
-            browsingHistory.setBrowseTime(new Date());
-            browsingHistoryMapper.insert(browsingHistory);
-        }
+        browsingHistoryClient.saveHistory(userId, id);
+    }
+
+    @Override
+    public BaseMapper<BrowsingHistory> getBaseMapper() {
+        return null;
+    }
+
+    @Override
+    public Class<BrowsingHistory> getEntityClass() {
+        return BrowsingHistory.class;
+    }
+
+    @Override
+    public boolean saveBatch(java.util.Collection<BrowsingHistory> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean saveOrUpdateBatch(java.util.Collection<BrowsingHistory> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateBatchById(java.util.Collection<BrowsingHistory> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean saveOrUpdate(BrowsingHistory entity) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public BrowsingHistory getOne(Wrapper<BrowsingHistory> queryWrapper, boolean throwEx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public java.util.Map<String, Object> getMap(Wrapper<BrowsingHistory> queryWrapper) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <V> V getObj(Wrapper<BrowsingHistory> queryWrapper, java.util.function.Function<? super Object, V> mapper) {
+        throw new UnsupportedOperationException();
     }
 }

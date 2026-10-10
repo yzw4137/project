@@ -1,83 +1,187 @@
 package com.atguigu.lease.web.app.service.impl;
 
-import com.atguigu.lease.model.entity.*;
-import com.atguigu.lease.model.enums.ItemType;
-import com.atguigu.lease.web.app.mapper.*;
+import com.atguigu.lease.api.apartment.ApartmentClient;
+import com.atguigu.lease.api.apartment.LeaseTermClient;
+import com.atguigu.lease.api.apartment.PaymentTypeClient;
+import com.atguigu.lease.api.apartment.RoomClient;
+import com.atguigu.lease.api.lease.LeaseAgreementClient;
+import com.atguigu.lease.common.login.LoginUserHolder;
+import com.atguigu.lease.common.result.Result;
+import com.atguigu.lease.model.entity.LeaseAgreement;
+import com.atguigu.lease.model.entity.LeaseTerm;
+import com.atguigu.lease.model.entity.PaymentType;
+import com.atguigu.lease.model.enums.LeaseStatus;
+import com.atguigu.lease.model.vo.apartment.AppApartmentDetailVo;
+import com.atguigu.lease.model.vo.room.AppRoomDetailVo;
 import com.atguigu.lease.web.app.service.LeaseAgreementService;
 import com.atguigu.lease.web.app.vo.agreement.AgreementDetailVo;
 import com.atguigu.lease.web.app.vo.agreement.AgreementItemVo;
-import com.atguigu.lease.web.app.vo.graph.GraphVo;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author liubo
- * @description 针对表【lease_agreement(租约信息表)】的数据库操作Service实现
- * @createDate 2023-07-26 11:12:39
- */
 @Service
-public class LeaseAgreementServiceImpl extends ServiceImpl<LeaseAgreementMapper, LeaseAgreement>
-        implements LeaseAgreementService {
+public class LeaseAgreementServiceImpl implements LeaseAgreementService {
 
     @Autowired
-    private LeaseAgreementMapper leaseAgreementMapper;
+    private LeaseAgreementClient leaseAgreementClient;
+
     @Autowired
-    private ApartmentInfoMapper apartmentInfoMapper;
+    private ApartmentClient apartmentClient;
+
     @Autowired
-    private RoomInfoMapper roomInfoMapper;
+    private RoomClient roomClient;
+
     @Autowired
-    private GraphInfoMapper graphInfoMapper;
+    private PaymentTypeClient paymentTypeClient;
+
     @Autowired
-    private PaymentTypeMapper paymentTypeMapper;
-    @Autowired
-    private LeaseTermMapper leaseTermMapper;
+    private LeaseTermClient leaseTermClient;
 
     @Override
     public List<AgreementItemVo> listItemByPhone() {
-        return leaseAgreementMapper.listItemByPhone();
+        String phone = LoginUserHolder.getLoginUser().getUsername();
+        Result<List<LeaseAgreement>> result = leaseAgreementClient.listByPhone(phone);
+        List<LeaseAgreement> list = result.getData();
+        if (list == null) {
+            return new ArrayList<>();
+        }
+        List<AgreementItemVo> ret = new ArrayList<>();
+        for (LeaseAgreement leaseAgreement : list) {
+            AgreementItemVo item = new AgreementItemVo();
+            item.setId(leaseAgreement.getId());
+            item.setLeaseStatus(leaseAgreement.getStatus());
+            item.setLeaseStartDate(leaseAgreement.getLeaseStartDate());
+            item.setLeaseEndDate(leaseAgreement.getLeaseEndDate());
+            item.setSourceType(leaseAgreement.getSourceType());
+            item.setRent(leaseAgreement.getRent());
+
+            AppRoomDetailVo room = roomClient.getAppDetailById(leaseAgreement.getRoomId()).getData();
+            if (room != null) {
+                item.setRoomNumber(room.getRoomNumber());
+                if (room.getApartmentItemVo() != null) {
+                    item.setApartmentName(room.getApartmentItemVo().getName());
+                }
+                if (room.getGraphVoList() != null) {
+                    item.setRoomGraphVoList(room.getGraphVoList());
+                }
+            }
+            ret.add(item);
+        }
+        return ret;
     }
 
     @Override
     public AgreementDetailVo getDetailById(Long id) {
-        //1.查询租约信息
-        LeaseAgreement leaseAgreement = leaseAgreementMapper.selectById(id);
+        LeaseAgreement leaseAgreement = leaseAgreementClient.getById(id).getData();
         if (leaseAgreement == null) {
             return null;
         }
-        //2.查询公寓信息
-        ApartmentInfo apartmentInfo = apartmentInfoMapper.selectById(leaseAgreement.getApartmentId());
+        AgreementDetailVo vo = new AgreementDetailVo();
+        BeanUtils.copyProperties(leaseAgreement, vo);
 
-        //3.查询房间信息
-        RoomInfo roomInfo = roomInfoMapper.selectById(leaseAgreement.getRoomId());
+        AppApartmentDetailVo apartment = apartmentClient.getAppDetailById(leaseAgreement.getApartmentId()).getData();
+        if (apartment != null) {
+            vo.setApartmentName(apartment.getName());
+            if (apartment.getGraphVoList() != null) {
+                vo.setApartmentGraphVoList(apartment.getGraphVoList());
+            }
+        }
 
-        //4.查询图片信息
-        List<GraphVo> roomGraphVoList = graphInfoMapper.selectListByItemTypeAndId(ItemType.ROOM, leaseAgreement.getRoomId());
-        List<GraphVo> apartmentGraphVoList = graphInfoMapper.selectListByItemTypeAndId(ItemType.APARTMENT, leaseAgreement.getApartmentId());
+        AppRoomDetailVo room = roomClient.getAppDetailById(leaseAgreement.getRoomId()).getData();
+        if (room != null) {
+            vo.setRoomNumber(room.getRoomNumber());
+            if (room.getGraphVoList() != null) {
+                vo.setRoomGraphVoList(room.getGraphVoList());
+            }
+        }
 
-        //5.查询支付方式
-        PaymentType paymentType = paymentTypeMapper.selectById(leaseAgreement.getPaymentTypeId());
+        List<PaymentType> paymentTypeList = paymentTypeClient.listByRoomId(leaseAgreement.getRoomId()).getData();
+        if (paymentTypeList != null) {
+            for (PaymentType pt : paymentTypeList) {
+                if (pt.getId().equals(leaseAgreement.getPaymentTypeId())) {
+                    vo.setPaymentTypeName(pt.getName());
+                    break;
+                }
+            }
+        }
 
-        //6.查询租期
-        LeaseTerm leaseTerm = leaseTermMapper.selectById(leaseAgreement.getLeaseTermId());
+        List<LeaseTerm> leaseTermList = leaseTermClient.listByRoomId(leaseAgreement.getRoomId()).getData();
+        if (leaseTermList != null) {
+            for (LeaseTerm lt : leaseTermList) {
+                if (lt.getId().equals(leaseAgreement.getLeaseTermId())) {
+                    vo.setLeaseTermMonthCount(lt.getMonthCount());
+                    vo.setLeaseTermUnit(lt.getUnit());
+                    break;
+                }
+            }
+        }
+        return vo;
+    }
 
-        AgreementDetailVo agreementDetailVo = new AgreementDetailVo();
-        BeanUtils.copyProperties(leaseAgreement, agreementDetailVo);
-        agreementDetailVo.setApartmentName(apartmentInfo.getName());
-        agreementDetailVo.setRoomNumber(roomInfo.getRoomNumber());
-        agreementDetailVo.setApartmentGraphVoList(apartmentGraphVoList);
-        agreementDetailVo.setRoomGraphVoList(roomGraphVoList);
-        agreementDetailVo.setPaymentTypeName(paymentType.getName());
-        agreementDetailVo.setLeaseTermMonthCount(leaseTerm.getMonthCount());
-        agreementDetailVo.setLeaseTermUnit(leaseTerm.getUnit());
+    @Override
+    public boolean saveOrUpdate(LeaseAgreement leaseAgreement) {
+        leaseAgreementClient.saveOrUpdate(leaseAgreement);
+        return true;
+    }
 
-        return agreementDetailVo;
+    @Override
+    public boolean update(Wrapper<LeaseAgreement> updateWrapper) {
+        Long id = null;
+        LeaseStatus status = null;
+        for (Object v : updateWrapper.getParamNameValuePairs().values()) {
+            if (v instanceof Long) {
+                id = (Long) v;
+            } else if (v instanceof LeaseStatus) {
+                status = (LeaseStatus) v;
+            }
+        }
+        leaseAgreementClient.updateStatusById(id, status);
+        return true;
+    }
+
+    @Override
+    public BaseMapper<LeaseAgreement> getBaseMapper() {
+        return null;
+    }
+
+    @Override
+    public Class<LeaseAgreement> getEntityClass() {
+        return LeaseAgreement.class;
+    }
+
+    @Override
+    public boolean saveBatch(java.util.Collection<LeaseAgreement> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean saveOrUpdateBatch(java.util.Collection<LeaseAgreement> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateBatchById(java.util.Collection<LeaseAgreement> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public LeaseAgreement getOne(Wrapper<LeaseAgreement> queryWrapper, boolean throwEx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public java.util.Map<String, Object> getMap(Wrapper<LeaseAgreement> queryWrapper) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <V> V getObj(Wrapper<LeaseAgreement> queryWrapper, java.util.function.Function<? super Object, V> mapper) {
+        throw new UnsupportedOperationException();
     }
 }
-
-
-
-

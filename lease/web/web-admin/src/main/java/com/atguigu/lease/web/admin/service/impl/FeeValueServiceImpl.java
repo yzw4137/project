@@ -1,22 +1,75 @@
 package com.atguigu.lease.web.admin.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.atguigu.lease.api.apartment.FeeClient;
 import com.atguigu.lease.model.entity.FeeValue;
 import com.atguigu.lease.web.admin.service.FeeValueService;
-import com.atguigu.lease.web.admin.mapper.FeeValueMapper;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
-* @author liubo
-* @description 针对表【fee_value(杂项费用值表)】的数据库操作Service实现
-* @createDate 2023-07-24 15:48:00
-*/
 @Service
-public class FeeValueServiceImpl extends ServiceImpl<FeeValueMapper, FeeValue>
-    implements FeeValueService{
+public class FeeValueServiceImpl implements FeeValueService {
 
+    @Autowired
+    private FeeClient feeClient;
+
+    @Override
+    public boolean saveOrUpdate(FeeValue feeValue) {
+        feeClient.saveOrUpdateFeeValue(feeValue);
+        return true;
+    }
+
+    @Override
+    public boolean removeById(java.io.Serializable id) {
+        feeClient.deleteFeeValueById((Long) id);
+        return true;
+    }
+
+    @Override
+    public boolean remove(Wrapper<FeeValue> wrapper) {
+        Long feeKeyId = (Long) wrapper.getParamNameValuePairs().values().iterator().next();
+        feeClient.deleteFeeKeyById(feeKeyId);
+        return true;
+    }
+
+    @Override
+    public BaseMapper<FeeValue> getBaseMapper() {
+        return null;
+    }
+
+    @Override
+    public Class<FeeValue> getEntityClass() {
+        return FeeValue.class;
+    }
+
+    @Override
+    public boolean saveBatch(java.util.Collection<FeeValue> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean saveOrUpdateBatch(java.util.Collection<FeeValue> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateBatchById(java.util.Collection<FeeValue> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public FeeValue getOne(Wrapper<FeeValue> queryWrapper, boolean throwEx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public java.util.Map<String, Object> getMap(Wrapper<FeeValue> queryWrapper) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <V> V getObj(Wrapper<FeeValue> queryWrapper, java.util.function.Function<? super Object, V> mapper) {
+        throw new UnsupportedOperationException();
+    }
 }
-
-
-
-

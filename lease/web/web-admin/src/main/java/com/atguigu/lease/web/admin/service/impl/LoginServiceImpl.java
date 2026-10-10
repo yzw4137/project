@@ -1,17 +1,17 @@
 package com.atguigu.lease.web.admin.service.impl;
 
+import com.atguigu.lease.api.user.SystemUserClient;
 import com.atguigu.lease.common.constant.RedisConstant;
 import com.atguigu.lease.common.exception.LeaseException;
+import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.common.result.ResultCodeEnum;
 import com.atguigu.lease.common.utils.JwtUtil;
 import com.atguigu.lease.model.entity.SystemUser;
 import com.atguigu.lease.model.enums.BaseStatus;
-import com.atguigu.lease.web.admin.mapper.SystemUserMapper;
 import com.atguigu.lease.web.admin.service.LoginService;
 import com.atguigu.lease.web.admin.vo.login.CaptchaVo;
 import com.atguigu.lease.web.admin.vo.login.LoginVo;
 import com.atguigu.lease.web.admin.vo.system.user.SystemUserInfoVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.wf.captcha.SpecCaptcha;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class LoginServiceImpl implements LoginService {
     private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
-    private SystemUserMapper systemUserMapper;
+    private SystemUserClient systemUserClient;
 
     @Override
     public CaptchaVo getCaptcha() {
@@ -52,7 +52,8 @@ public class LoginServiceImpl implements LoginService {
             throw new LeaseException(ResultCodeEnum.ADMIN_CAPTCHA_CODE_ERROR);
         }
 
-        SystemUser systemUser = systemUserMapper.selectOneByUsername(loginVo.getUsername());
+        Result<SystemUser> result = systemUserClient.getByUsername(loginVo.getUsername());
+        SystemUser systemUser = result.getData();
         if(systemUser == null){
             throw new LeaseException(ResultCodeEnum.ADMIN_ACCOUNT_NOT_EXIST_ERROR);
         }
@@ -68,7 +69,8 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public SystemUserInfoVo getLoginUserInfoById(Long userId) {
-        SystemUser systemUser = systemUserMapper.selectById(userId);
+        Result<com.atguigu.lease.model.vo.system.user.SystemUserItemVo> result = systemUserClient.getById(userId);
+        com.atguigu.lease.model.vo.system.user.SystemUserItemVo systemUser = result.getData();
         SystemUserInfoVo systemUserInfoVo = new SystemUserInfoVo();
         systemUserInfoVo.setName(systemUser.getName());
         systemUserInfoVo.setAvatarUrl(systemUser.getAvatarUrl());

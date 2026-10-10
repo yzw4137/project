@@ -4,7 +4,7 @@ package com.atguigu.lease.web.app.controller.history;
 import com.atguigu.lease.common.login.LoginUserHolder;
 import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.web.app.service.BrowsingHistoryService;
-import com.atguigu.lease.web.app.vo.history.HistoryItemVo;
+import com.atguigu.lease.model.vo.history.HistoryItemVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;

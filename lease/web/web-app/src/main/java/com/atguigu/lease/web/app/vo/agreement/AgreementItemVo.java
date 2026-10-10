@@ -2,7 +2,7 @@ package com.atguigu.lease.web.app.vo.agreement;
 
 import com.atguigu.lease.model.enums.LeaseSourceType;
 import com.atguigu.lease.model.enums.LeaseStatus;
-import com.atguigu.lease.web.app.vo.graph.GraphVo;
+import com.atguigu.lease.model.vo.graph.GraphVo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

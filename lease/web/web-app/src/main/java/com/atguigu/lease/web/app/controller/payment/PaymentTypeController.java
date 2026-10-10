@@ -3,7 +3,6 @@ package com.atguigu.lease.web.app.controller.payment;
 
 import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.PaymentType;
-import com.atguigu.lease.web.app.mapper.PaymentTypeMapper;
 import com.atguigu.lease.web.app.service.PaymentTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

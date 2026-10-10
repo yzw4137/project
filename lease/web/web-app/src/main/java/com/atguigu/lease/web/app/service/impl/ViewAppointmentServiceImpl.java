@@ -1,51 +1,103 @@
 package com.atguigu.lease.web.app.service.impl;
 
+import com.atguigu.lease.api.apartment.ApartmentClient;
+import com.atguigu.lease.api.user.ViewAppointmentClient;
+import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.ViewAppointment;
-import com.atguigu.lease.web.app.mapper.ViewAppointmentMapper;
-import com.atguigu.lease.web.app.service.ApartmentInfoService;
 import com.atguigu.lease.web.app.service.ViewAppointmentService;
-import com.atguigu.lease.web.app.vo.apartment.ApartmentItemVo;
-import com.atguigu.lease.web.app.vo.appointment.AppointmentDetailVo;
-import com.atguigu.lease.web.app.vo.appointment.AppointmentItemVo;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.atguigu.lease.model.vo.apartment.AppApartmentItemVo;
+import com.atguigu.lease.model.vo.appointment.AppointmentDetailVo;
+import com.atguigu.lease.model.vo.appointment.AppointmentItemVo;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * @author liubo
- * @description 针对表【view_appointment(预约看房信息表)】的数据库操作Service实现
- * @createDate 2023-07-26 11:12:39
- */
 @Service
-public class ViewAppointmentServiceImpl extends ServiceImpl<ViewAppointmentMapper, ViewAppointment>
-        implements ViewAppointmentService {
+public class ViewAppointmentServiceImpl implements ViewAppointmentService {
+
     @Autowired
-    private ViewAppointmentMapper viewAppointmentMapper;
+    private ViewAppointmentClient viewAppointmentClient;
+
     @Autowired
-    private ApartmentInfoService apartmentInfoService;
+    private ApartmentClient apartmentClient;
+
+    @Override
+    public boolean saveOrUpdate(ViewAppointment viewAppointment) {
+        viewAppointmentClient.saveOrUpdate(viewAppointment);
+        return true;
+    }
 
     @Override
     public List<AppointmentItemVo> listItemByUserId(Long userId) {
-        return viewAppointmentMapper.listItemByUserId(userId);
+        Result<List<AppointmentItemVo>> result =
+                viewAppointmentClient.listItemByUserId(userId);
+        return result.getData();
     }
 
     @Override
     public AppointmentDetailVo getDetailById(Long id) {
-        ViewAppointment viewAppointment = viewAppointmentMapper.selectById(id);
-        ApartmentItemVo apartmentItemVo = apartmentInfoService.selectApartmentItemVoById(viewAppointment.getApartmentId());
+        Result<ViewAppointment> result = viewAppointmentClient.getById(id);
+        ViewAppointment viewAppointment = result.getData();
+        if (viewAppointment == null) {
+            return null;
+        }
+        com.atguigu.lease.model.vo.apartment.AppApartmentDetailVo aptSrc =
+                apartmentClient.getAppDetailById(viewAppointment.getApartmentId()).getData();
 
-        AppointmentDetailVo agreementDetailVo = new AppointmentDetailVo();
-        BeanUtils.copyProperties(viewAppointment, agreementDetailVo);
+        AppointmentDetailVo appointmentDetailVo = new AppointmentDetailVo();
+        BeanUtils.copyProperties(viewAppointment, appointmentDetailVo);
 
-        agreementDetailVo.setApartmentItemVo(apartmentItemVo);
+        if (aptSrc != null) {
+            AppApartmentItemVo apartmentItemVo = new AppApartmentItemVo();
+            BeanUtils.copyProperties(aptSrc, apartmentItemVo);
+            apartmentItemVo.setMinRent(aptSrc.getMinRent());
+            appointmentDetailVo.setApartmentItemVo(apartmentItemVo);
+        }
 
-        return agreementDetailVo;
+        return appointmentDetailVo;
+    }
+
+    @Override
+    public BaseMapper<ViewAppointment> getBaseMapper() {
+        return null;
+    }
+
+    @Override
+    public Class<ViewAppointment> getEntityClass() {
+        return ViewAppointment.class;
+    }
+
+    @Override
+    public boolean saveBatch(java.util.Collection<ViewAppointment> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean saveOrUpdateBatch(java.util.Collection<ViewAppointment> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateBatchById(java.util.Collection<ViewAppointment> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ViewAppointment getOne(Wrapper<ViewAppointment> queryWrapper, boolean throwEx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public java.util.Map<String, Object> getMap(Wrapper<ViewAppointment> queryWrapper) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <V> V getObj(Wrapper<ViewAppointment> queryWrapper, java.util.function.Function<? super Object, V> mapper) {
+        throw new UnsupportedOperationException();
     }
 }
-
-
-
-

@@ -1,32 +1,73 @@
 package com.atguigu.lease.web.app.service.impl;
 
+import com.atguigu.lease.api.apartment.PaymentTypeClient;
 import com.atguigu.lease.model.entity.PaymentType;
-import com.atguigu.lease.web.app.mapper.LeaseTermMapper;
-import com.atguigu.lease.web.app.mapper.PaymentTypeMapper;
 import com.atguigu.lease.web.app.service.PaymentTypeService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
-* @author liubo
-* @description 针对表【payment_type(支付方式表)】的数据库操作Service实现
-* @createDate 2023-07-26 11:12:39
-*/
 @Service
-public class PaymentTypeServiceImpl extends ServiceImpl<PaymentTypeMapper, PaymentType>
-    implements PaymentTypeService{
+public class PaymentTypeServiceImpl implements PaymentTypeService {
+
     @Autowired
-    private PaymentTypeMapper paymentTypeMapper;
+    private PaymentTypeClient paymentTypeClient;
 
     @Override
     public List<PaymentType> listByRoomId(Long id) {
-        return paymentTypeMapper.selectListByRoomId(id);
+        return paymentTypeClient.listByRoomId(id).getData();
+    }
+
+    @Override
+    public List<PaymentType> list() {
+        return paymentTypeClient.listPaymentType().getData();
+    }
+
+    @Override
+    public BaseMapper<PaymentType> getBaseMapper() {
+        return null;
+    }
+
+    @Override
+    public Class<PaymentType> getEntityClass() {
+        return PaymentType.class;
+    }
+
+    @Override
+    public boolean saveBatch(java.util.Collection<PaymentType> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean saveOrUpdateBatch(java.util.Collection<PaymentType> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateBatchById(java.util.Collection<PaymentType> entityList, int batchSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean saveOrUpdate(PaymentType entity) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PaymentType getOne(Wrapper<PaymentType> queryWrapper, boolean throwEx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public java.util.Map<String, Object> getMap(Wrapper<PaymentType> queryWrapper) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <V> V getObj(Wrapper<PaymentType> queryWrapper, java.util.function.Function<? super Object, V> mapper) {
+        throw new UnsupportedOperationException();
     }
 }
-
-
-
-

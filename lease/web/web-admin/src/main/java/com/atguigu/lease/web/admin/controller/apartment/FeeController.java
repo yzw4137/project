@@ -6,7 +6,7 @@ import com.atguigu.lease.model.entity.FeeKey;
 import com.atguigu.lease.model.entity.FeeValue;
 import com.atguigu.lease.web.admin.service.FeeKeyService;
 import com.atguigu.lease.web.admin.service.FeeValueService;
-import com.atguigu.lease.web.admin.vo.fee.FeeKeyVo;
+import com.atguigu.lease.model.vo.fee.FeeKeyVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

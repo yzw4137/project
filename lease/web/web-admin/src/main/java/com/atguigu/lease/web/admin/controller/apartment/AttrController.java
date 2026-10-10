@@ -6,7 +6,7 @@ import com.atguigu.lease.model.entity.AttrKey;
 import com.atguigu.lease.model.entity.AttrValue;
 import com.atguigu.lease.web.admin.service.AttrKeyService;
 import com.atguigu.lease.web.admin.service.AttrValueService;
-import com.atguigu.lease.web.admin.vo.attr.AttrKeyVo;
+import com.atguigu.lease.model.vo.attr.AttrKeyVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

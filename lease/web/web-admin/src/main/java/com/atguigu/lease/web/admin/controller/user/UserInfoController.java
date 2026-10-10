@@ -5,7 +5,7 @@ import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.UserInfo;
 import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.web.admin.service.UserInfoService;
-import com.atguigu.lease.web.admin.vo.user.UserInfoQueryVo;
+import com.atguigu.lease.model.vo.user.UserInfoQueryVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
