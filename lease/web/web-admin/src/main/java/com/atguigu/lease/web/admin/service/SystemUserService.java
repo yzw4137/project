@@ -1,10 +1,9 @@
 package com.atguigu.lease.web.admin.service;
 
 import com.atguigu.lease.model.entity.SystemUser;
+import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.model.vo.system.user.SystemUserItemVo;
 import com.atguigu.lease.model.vo.system.user.SystemUserQueryVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -23,7 +22,7 @@ public interface SystemUserService {
 
     boolean removeById(Long id);
 
-    long count(LambdaQueryWrapper<SystemUser> queryWrapper);
+    boolean isUserNameAvailable(String username);
 
-    boolean update(LambdaUpdateWrapper<SystemUser> updateWrapper);
+    boolean updateStatusById(Long id, BaseStatus status);
 }

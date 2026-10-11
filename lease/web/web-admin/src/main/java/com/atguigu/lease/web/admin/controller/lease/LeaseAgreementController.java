@@ -7,7 +7,6 @@ import com.atguigu.lease.model.enums.LeaseStatus;
 import com.atguigu.lease.web.admin.service.LeaseAgreementService;
 import com.atguigu.lease.model.vo.lease.AgreementQueryVo;
 import com.atguigu.lease.web.admin.vo.agreement.AgreementVo;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,10 +55,7 @@ public class LeaseAgreementController {
     @Operation(summary = "根据id更新租约状态")
     @PostMapping("updateStatusById")
     public Result updateStatusById(@RequestParam Long id, @RequestParam LeaseStatus status) {
-        LambdaUpdateWrapper<LeaseAgreement> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(LeaseAgreement::getId, id);
-        updateWrapper.set(LeaseAgreement::getStatus, status);
-        leaseAgreementService.update(updateWrapper);
+        leaseAgreementService.updateStatusById(id, status);
         return Result.ok();
     }
 

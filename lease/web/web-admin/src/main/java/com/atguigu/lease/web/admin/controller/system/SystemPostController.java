@@ -4,13 +4,11 @@ import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.SystemPost;
 import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.web.admin.service.SystemPostService;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -63,10 +61,7 @@ public class SystemPostController {
     @Operation(summary = "根据岗位id修改状态")
     @PostMapping("updateStatusByPostId")
     public Result updateStatusByPostId(@RequestParam Long id, @RequestParam BaseStatus status) {
-        LambdaUpdateWrapper<SystemPost> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(SystemPost::getId, id);
-        updateWrapper.set(SystemPost::getStatus, status);
-        systemPostService.update(updateWrapper);
+        systemPostService.updateStatusByPostId(id, status);
         return Result.ok();
     }
 }

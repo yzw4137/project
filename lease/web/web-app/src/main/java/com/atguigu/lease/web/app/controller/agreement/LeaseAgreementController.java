@@ -7,7 +7,6 @@ import com.atguigu.lease.model.enums.LeaseStatus;
 import com.atguigu.lease.web.app.service.LeaseAgreementService;
 import com.atguigu.lease.web.app.vo.agreement.AgreementDetailVo;
 import com.atguigu.lease.web.app.vo.agreement.AgreementItemVo;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +40,7 @@ public class LeaseAgreementController {
     @Operation(summary = "根据id更新租约状态", description = "用于确认租约和提前退租")
     @PostMapping("updateStatusById")
     public Result updateStatusById(@RequestParam Long id, @RequestParam LeaseStatus leaseStatus) {
-        LambdaUpdateWrapper<LeaseAgreement> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(LeaseAgreement::getId, id);
-        updateWrapper.set(LeaseAgreement::getStatus, leaseStatus);
-        service.update(updateWrapper);
+        service.updateStatusById(id, leaseStatus);
         return Result.ok();
     }
 

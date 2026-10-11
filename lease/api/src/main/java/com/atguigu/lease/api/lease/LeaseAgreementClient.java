@@ -31,4 +31,7 @@ public interface LeaseAgreementClient {
 
     @GetMapping("/agreement/listByPhone")
     Result<List<LeaseAgreement>> listByPhone(@RequestParam("phone") String phone);
+
+    @PostMapping("/agreement/expireLeaseAgreement")
+    Result expireLeaseAgreement();
 }

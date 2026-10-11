@@ -1,12 +1,11 @@
 package com.atguigu.lease.web.admin.service;
 
 import com.atguigu.lease.model.entity.RoomInfo;
+import com.atguigu.lease.model.enums.ReleaseStatus;
 import com.atguigu.lease.model.vo.room.RoomDetailVo;
 import com.atguigu.lease.model.vo.room.RoomItemVo;
 import com.atguigu.lease.model.vo.room.RoomQueryVo;
 import com.atguigu.lease.model.vo.room.RoomSubmitVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -27,7 +26,7 @@ public interface RoomInfoService {
 
     void removeRoomById(Long id);
 
-    boolean update(LambdaUpdateWrapper<RoomInfo> updateWrapper);
+    boolean updateReleaseStatusById(Long id, ReleaseStatus status);
 
-    List<RoomInfo> list(LambdaQueryWrapper<RoomInfo> queryWrapper);
+    List<RoomInfo> listBasicByApartmentId(Long apartmentId);
 }

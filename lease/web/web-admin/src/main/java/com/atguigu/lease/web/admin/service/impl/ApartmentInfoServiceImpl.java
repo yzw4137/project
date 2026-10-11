@@ -9,8 +9,6 @@ import com.atguigu.lease.model.vo.apartment.ApartmentItemVo;
 import com.atguigu.lease.model.vo.apartment.ApartmentQueryVo;
 import com.atguigu.lease.model.vo.apartment.ApartmentSubmitVo;
 import com.atguigu.lease.web.admin.service.ApartmentInfoService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,18 +45,13 @@ public class ApartmentInfoServiceImpl implements ApartmentInfoService {
     }
 
     @Override
-    public boolean update(LambdaUpdateWrapper<ApartmentInfo> updateWrapper) {
-        Long id = (Long) updateWrapper.getParamNameValuePairs().values().stream()
-                .filter(v -> v instanceof Long).findFirst().orElse(null);
-        Object status = updateWrapper.getParamNameValuePairs().values().stream()
-                .filter(v -> v instanceof ReleaseStatus).findFirst().orElse(null);
-        apartmentClient.updateReleaseStatusById(id, (ReleaseStatus) status);
+    public boolean updateReleaseStatusById(Long id, ReleaseStatus status) {
+        apartmentClient.updateReleaseStatusById(id, status);
         return true;
     }
 
     @Override
-    public List<ApartmentInfo> list(LambdaQueryWrapper<ApartmentInfo> queryWrapper) {
-        Long districtId = (Long) queryWrapper.getParamNameValuePairs().values().iterator().next();
+    public List<ApartmentInfo> listByDistrictId(Long districtId) {
         return apartmentClient.listInfoByDistrictId(districtId).getData();
     }
 }

@@ -5,7 +5,6 @@ import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.SystemPost;
 import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.web.admin.service.SystemPostService;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,16 +49,7 @@ public class SystemPostServiceImpl implements SystemPostService {
     }
 
     @Override
-    public boolean update(LambdaUpdateWrapper<SystemPost> updateWrapper) {
-        Long id = null;
-        BaseStatus status = null;
-        for (Object v : updateWrapper.getParamNameValuePairs().values()) {
-            if (v instanceof Long) {
-                id = (Long) v;
-            } else if (v instanceof BaseStatus) {
-                status = (BaseStatus) v;
-            }
-        }
+    public boolean updateStatusByPostId(Long id, BaseStatus status) {
         systemPostClient.updateStatusByPostId(id, status);
         return true;
     }

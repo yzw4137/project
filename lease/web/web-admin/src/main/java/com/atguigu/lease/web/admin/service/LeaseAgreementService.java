@@ -1,9 +1,9 @@
 package com.atguigu.lease.web.admin.service;
 
 import com.atguigu.lease.model.entity.LeaseAgreement;
+import com.atguigu.lease.model.enums.LeaseStatus;
 import com.atguigu.lease.model.vo.lease.AgreementQueryVo;
 import com.atguigu.lease.web.admin.vo.agreement.AgreementVo;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -22,5 +22,7 @@ public interface LeaseAgreementService {
 
     boolean removeById(Long id);
 
-    boolean update(LambdaUpdateWrapper<LeaseAgreement> updateWrapper);
+    boolean updateStatusById(Long id, LeaseStatus status);
+
+    void expireLeaseAgreement();
 }

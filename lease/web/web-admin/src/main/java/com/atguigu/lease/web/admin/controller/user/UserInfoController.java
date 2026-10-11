@@ -6,8 +6,6 @@ import com.atguigu.lease.model.entity.UserInfo;
 import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.web.admin.service.UserInfoService;
 import com.atguigu.lease.model.vo.user.UserInfoQueryVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,20 +25,14 @@ public class UserInfoController {
     public Result<IPage<UserInfo>> pageUserInfo(@RequestParam long current, @RequestParam long size, UserInfoQueryVo queryVo) {
 
         Page<UserInfo> page = new Page<>(current, size);
-        LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<UserInfo>();
-        queryWrapper.like(queryVo.getPhone() != null, UserInfo::getPhone, queryVo.getPhone());
-        queryWrapper.eq(queryVo.getStatus() != null, UserInfo::getStatus, queryVo.getStatus());
-        IPage<UserInfo> pageModel = userInfoService.page(page, queryWrapper);
+        IPage<UserInfo> pageModel = userInfoService.page(page, queryVo);
         return Result.ok(pageModel);
     }
 
     @Operation(summary = "根据用户id更新账号状态")
     @PostMapping("updateStatusById")
     public Result updateStatusById(@RequestParam Long id, @RequestParam BaseStatus status) {
-        LambdaUpdateWrapper<UserInfo> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(UserInfo::getId, id);
-        updateWrapper.set(UserInfo::getStatus, status);
-        userInfoService.update(updateWrapper);
+        userInfoService.updateStatusById(id, status);
         return Result.ok();
     }
 }

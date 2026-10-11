@@ -60,4 +60,11 @@ public class LeaseAgreementController {
     public Result<List<LeaseAgreement>> listByPhone(@RequestParam String phone) {
         return Result.ok(leaseAgreementService.listByPhone(phone));
     }
+
+    @Operation(summary = "将已到期租约置为已过期")
+    @PostMapping("expireLeaseAgreement")
+    public Result expireLeaseAgreement() {
+        leaseAgreementService.expireLeaseAgreement();
+        return Result.ok();
+    }
 }

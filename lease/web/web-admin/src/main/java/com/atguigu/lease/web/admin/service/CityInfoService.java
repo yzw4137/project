@@ -1,7 +1,6 @@
 package com.atguigu.lease.web.admin.service;
 
 import com.atguigu.lease.model.entity.CityInfo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 import java.util.List;
 
@@ -12,5 +11,5 @@ import java.util.List;
 */
 public interface CityInfoService {
 
-    List<CityInfo> list(LambdaQueryWrapper<CityInfo> queryWrapper);
+    List<CityInfo> listByProvinceId(Long provinceId);
 }

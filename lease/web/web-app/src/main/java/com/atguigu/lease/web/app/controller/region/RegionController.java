@@ -8,7 +8,6 @@ import com.atguigu.lease.model.entity.ProvinceInfo;
 import com.atguigu.lease.web.app.service.CityInfoService;
 import com.atguigu.lease.web.app.service.DistrictInfoService;
 import com.atguigu.lease.web.app.service.ProvinceInfoService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,18 +42,14 @@ public class RegionController {
     @Operation(summary="根据省份id查询城市信息列表")
     @GetMapping("city/listByProvinceId")
     public Result<List<CityInfo>> listCityInfoByProvinceId(@RequestParam Long id){
-        LambdaQueryWrapper<CityInfo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(CityInfo::getProvinceId,id);
-        List<CityInfo> list = cityInfoService.list(queryWrapper);
+        List<CityInfo> list = cityInfoService.listByProvinceId(id);
         return Result.ok(list);
     }
 
     @GetMapping("district/listByCityId")
     @Operation(summary="根据城市id查询区县信息")
     public Result<List<DistrictInfo>> listDistrictInfoByCityId(@RequestParam Long id){
-        LambdaQueryWrapper<DistrictInfo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(DistrictInfo::getCityId,id);
-        List<DistrictInfo> list = districtInfoService.list(queryWrapper);
+        List<DistrictInfo> list = districtInfoService.listByCityId(id);
         return Result.ok(list);
     }
 }

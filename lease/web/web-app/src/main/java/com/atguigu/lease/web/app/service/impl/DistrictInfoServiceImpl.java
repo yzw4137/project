@@ -3,7 +3,6 @@ package com.atguigu.lease.web.app.service.impl;
 import com.atguigu.lease.api.apartment.RegionClient;
 import com.atguigu.lease.model.entity.DistrictInfo;
 import com.atguigu.lease.web.app.service.DistrictInfoService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,7 @@ public class DistrictInfoServiceImpl implements DistrictInfoService {
     private RegionClient regionClient;
 
     @Override
-    public List<DistrictInfo> list(LambdaQueryWrapper<DistrictInfo> queryWrapper) {
-        Long cityId = (Long) queryWrapper.getParamNameValuePairs().values().iterator().next();
+    public List<DistrictInfo> listByCityId(Long cityId) {
         return regionClient.listDistrictInfoByCityId(cityId).getData();
     }
 }

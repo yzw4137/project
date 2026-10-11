@@ -1,7 +1,6 @@
 package com.atguigu.lease.web.admin.service;
 
 import com.atguigu.lease.model.entity.AttrValue;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 import java.io.Serializable;
 
@@ -15,6 +14,4 @@ public interface AttrValueService {
     boolean saveOrUpdate(AttrValue attrValue);
 
     boolean removeById(Serializable id);
-
-    boolean remove(LambdaQueryWrapper<AttrValue> wrapper);
 }

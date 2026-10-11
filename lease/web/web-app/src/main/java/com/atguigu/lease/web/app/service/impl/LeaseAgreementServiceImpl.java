@@ -16,7 +16,6 @@ import com.atguigu.lease.model.vo.room.AppRoomDetailVo;
 import com.atguigu.lease.web.app.service.LeaseAgreementService;
 import com.atguigu.lease.web.app.vo.agreement.AgreementDetailVo;
 import com.atguigu.lease.web.app.vo.agreement.AgreementItemVo;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -130,16 +129,7 @@ public class LeaseAgreementServiceImpl implements LeaseAgreementService {
     }
 
     @Override
-    public boolean update(LambdaUpdateWrapper<LeaseAgreement> updateWrapper) {
-        Long id = null;
-        LeaseStatus status = null;
-        for (Object v : updateWrapper.getParamNameValuePairs().values()) {
-            if (v instanceof Long) {
-                id = (Long) v;
-            } else if (v instanceof LeaseStatus) {
-                status = (LeaseStatus) v;
-            }
-        }
+    public boolean updateStatusById(Long id, LeaseStatus status) {
         leaseAgreementClient.updateStatusById(id, status);
         return true;
     }

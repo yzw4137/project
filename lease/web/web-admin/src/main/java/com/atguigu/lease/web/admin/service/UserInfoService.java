@@ -1,8 +1,8 @@
 package com.atguigu.lease.web.admin.service;
 
 import com.atguigu.lease.model.entity.UserInfo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.atguigu.lease.model.enums.BaseStatus;
+import com.atguigu.lease.model.vo.user.UserInfoQueryVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 */
 public interface UserInfoService {
 
-    IPage<UserInfo> page(Page<UserInfo> page, LambdaQueryWrapper<UserInfo> queryWrapper);
+    IPage<UserInfo> page(Page<UserInfo> page, UserInfoQueryVo queryVo);
 
-    boolean update(LambdaUpdateWrapper<UserInfo> updateWrapper);
+    boolean updateStatusById(Long id, BaseStatus status);
 }

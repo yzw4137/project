@@ -4,7 +4,6 @@ package com.atguigu.lease.web.admin.controller.apartment;
 import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.PaymentType;
 import com.atguigu.lease.web.admin.service.PaymentTypeService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,6 @@ public class PaymentTypeController {
     @Operation(summary = "查询全部支付方式列表")
     @GetMapping("list")
     public Result<List<PaymentType>> listPaymentType() {
-//        LambdaQueryWrapper<PaymentType> wrapper = new LambdaQueryWrapper<>();
-//        wrapper.eq(PaymentType::getIsDeleted, 0);
         List<PaymentType> list = paymentTypeService.list();
         return Result.ok(list);
     }

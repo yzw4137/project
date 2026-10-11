@@ -9,8 +9,6 @@ import com.atguigu.lease.model.vo.apartment.ApartmentDetailVo;
 import com.atguigu.lease.model.vo.apartment.ApartmentItemVo;
 import com.atguigu.lease.model.vo.apartment.ApartmentQueryVo;
 import com.atguigu.lease.model.vo.apartment.ApartmentSubmitVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,19 +59,14 @@ public class ApartmentController {
     @Operation(summary = "根据id修改公寓发布状态")
     @PostMapping("updateReleaseStatusById")
     public Result updateReleaseStatusById(@RequestParam Long id, @RequestParam ReleaseStatus status) {
-        LambdaUpdateWrapper<ApartmentInfo> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(ApartmentInfo::getId, id);
-        wrapper.set(ApartmentInfo::getIsRelease, status);
-        apartmentService.update(wrapper);
+        apartmentService.updateReleaseStatusById(id, status);
         return Result.ok();
     }
 
     @Operation(summary = "根据区县id查询公寓信息列表")
     @GetMapping("listInfoByDistrictId")
     public Result<List<ApartmentInfo>> listInfoByDistrictId(@RequestParam Long id) {
-        LambdaQueryWrapper<ApartmentInfo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ApartmentInfo::getDistrictId, id);
-        List<ApartmentInfo> list = apartmentService.list(wrapper);
+        List<ApartmentInfo> list = apartmentService.listByDistrictId(id);
         return Result.ok(list);
     }
 }

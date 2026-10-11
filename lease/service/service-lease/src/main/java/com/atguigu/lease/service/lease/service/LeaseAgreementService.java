@@ -16,4 +16,6 @@ public interface LeaseAgreementService extends IService<LeaseAgreement> {
     void updateStatusById(Long id, LeaseStatus status);
 
     List<LeaseAgreement> listByPhone(String phone);
+
+    void expireLeaseAgreement();
 }

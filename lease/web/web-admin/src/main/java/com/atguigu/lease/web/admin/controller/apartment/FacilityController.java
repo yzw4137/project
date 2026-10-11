@@ -5,7 +5,6 @@ import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.FacilityInfo;
 import com.atguigu.lease.model.enums.ItemType;
 import com.atguigu.lease.web.admin.service.FacilityInfoService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +24,7 @@ public class FacilityController {
     @Operation(summary = "[根据类型]查询配套信息列表")
     @GetMapping("list")
     public Result<List<FacilityInfo>> listFacility(@RequestParam(required = false) ItemType type) {
-        LambdaQueryWrapper<FacilityInfo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(type!=null, FacilityInfo::getType, type);
-        List<FacilityInfo> list = Service.list(wrapper);
+        List<FacilityInfo> list = Service.listByType(type);
         return Result.ok(list);
     }
 

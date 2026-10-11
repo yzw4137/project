@@ -11,7 +11,6 @@ import com.atguigu.lease.model.enums.LeaseStatus;
 import com.atguigu.lease.model.vo.lease.AgreementQueryVo;
 import com.atguigu.lease.web.admin.service.LeaseAgreementService;
 import com.atguigu.lease.web.admin.vo.agreement.AgreementVo;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
@@ -106,17 +105,13 @@ public class LeaseAgreementServiceImpl implements LeaseAgreementService {
     }
 
     @Override
-    public boolean update(LambdaUpdateWrapper<LeaseAgreement> updateWrapper) {
-        Long id = null;
-        LeaseStatus status = null;
-        for (Object v : updateWrapper.getParamNameValuePairs().values()) {
-            if (v instanceof Long) {
-                id = (Long) v;
-            } else if (v instanceof LeaseStatus) {
-                status = (LeaseStatus) v;
-            }
-        }
+    public boolean updateStatusById(Long id, LeaseStatus status) {
         leaseAgreementClient.updateStatusById(id, status);
         return true;
+    }
+
+    @Override
+    public void expireLeaseAgreement() {
+        leaseAgreementClient.expireLeaseAgreement();
     }
 }

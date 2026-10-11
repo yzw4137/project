@@ -7,7 +7,6 @@ import com.atguigu.lease.model.entity.FeeValue;
 import com.atguigu.lease.web.admin.service.FeeKeyService;
 import com.atguigu.lease.web.admin.service.FeeValueService;
 import com.atguigu.lease.model.vo.fee.FeeKeyVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,12 +50,7 @@ public class FeeController {
     @Operation(summary = "根据id删除杂费名称")
     @DeleteMapping("key/deleteById")
     public Result deleteFeeKeyById(@RequestParam Long feeKeyId) {
-        //删除杂费名称
         feeKeyService.removeById(feeKeyId);
-        //删除杂费值
-        LambdaQueryWrapper<FeeValue> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(FeeValue::getFeeKeyId, feeKeyId);
-        feeValueService.remove(queryWrapper);
         return Result.ok();
     }
 

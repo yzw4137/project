@@ -9,8 +9,6 @@ import com.atguigu.lease.model.vo.room.RoomItemVo;
 import com.atguigu.lease.model.vo.room.RoomQueryVo;
 import com.atguigu.lease.model.vo.room.RoomSubmitVo;
 import com.atguigu.lease.web.admin.service.RoomInfoService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,19 +45,13 @@ public class RoomInfoServiceImpl implements RoomInfoService {
     }
 
     @Override
-    public boolean update(LambdaUpdateWrapper<RoomInfo> updateWrapper) {
-        Long id = (Long) updateWrapper.getParamNameValuePairs().values().stream()
-                .filter(v -> v instanceof Long).findFirst().orElse(null);
-        Object status = updateWrapper.getParamNameValuePairs().values().stream()
-                .filter(v -> v instanceof ReleaseStatus).findFirst().orElse(null);
-        roomClient.updateReleaseStatusById(id, (ReleaseStatus) status);
+    public boolean updateReleaseStatusById(Long id, ReleaseStatus status) {
+        roomClient.updateReleaseStatusById(id, status);
         return true;
     }
 
     @Override
-    public List<RoomInfo> list(LambdaQueryWrapper<RoomInfo> queryWrapper) {
-        Long apartmentId = (Long) queryWrapper.getParamNameValuePairs().values().stream()
-                .filter(v -> v instanceof Long).findFirst().orElse(null);
+    public List<RoomInfo> listBasicByApartmentId(Long apartmentId) {
         return roomClient.listBasicByApartmentId(apartmentId).getData();
     }
 }

@@ -1,7 +1,7 @@
 package com.atguigu.lease.web.admin.service;
 
 import com.atguigu.lease.model.entity.LabelInfo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.atguigu.lease.model.enums.ItemType;
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
 */
 public interface LabelInfoService {
 
-    List<LabelInfo> list(LambdaQueryWrapper<LabelInfo> queryWrapper);
+    List<LabelInfo> listByType(ItemType type);
 
     boolean saveOrUpdate(LabelInfo labelInfo);
 

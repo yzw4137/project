@@ -4,7 +4,6 @@ import com.atguigu.lease.api.apartment.LabelClient;
 import com.atguigu.lease.model.entity.LabelInfo;
 import com.atguigu.lease.model.enums.ItemType;
 import com.atguigu.lease.web.admin.service.LabelInfoService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +17,7 @@ public class LabelInfoServiceImpl implements LabelInfoService {
     private LabelClient labelClient;
 
     @Override
-    public List<LabelInfo> list(LambdaQueryWrapper<LabelInfo> queryWrapper) {
-        ItemType type = (ItemType) queryWrapper.getParamNameValuePairs().values().stream()
-                .filter(v -> v instanceof ItemType).findFirst().orElse(null);
+    public List<LabelInfo> listByType(ItemType type) {
         return labelClient.labelList(type).getData();
     }
 

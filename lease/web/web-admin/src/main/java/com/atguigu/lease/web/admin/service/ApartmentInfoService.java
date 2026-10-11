@@ -4,9 +4,8 @@ import com.atguigu.lease.model.entity.ApartmentInfo;
 import com.atguigu.lease.model.vo.apartment.ApartmentDetailVo;
 import com.atguigu.lease.model.vo.apartment.ApartmentItemVo;
 import com.atguigu.lease.model.vo.apartment.ApartmentQueryVo;
+import com.atguigu.lease.model.enums.ReleaseStatus;
 import com.atguigu.lease.model.vo.apartment.ApartmentSubmitVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -27,7 +26,7 @@ public interface ApartmentInfoService {
 
     void removeApartmentById(Long id);
 
-    boolean update(LambdaUpdateWrapper<ApartmentInfo> updateWrapper);
+    boolean updateReleaseStatusById(Long id, ReleaseStatus status);
 
-    List<ApartmentInfo> list(LambdaQueryWrapper<ApartmentInfo> queryWrapper);
+    List<ApartmentInfo> listByDistrictId(Long districtId);
 }

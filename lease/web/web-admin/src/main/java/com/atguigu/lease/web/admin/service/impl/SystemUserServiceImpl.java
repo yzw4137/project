@@ -7,8 +7,6 @@ import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.web.admin.service.SystemUserService;
 import com.atguigu.lease.model.vo.system.user.SystemUserItemVo;
 import com.atguigu.lease.model.vo.system.user.SystemUserQueryVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,29 +43,13 @@ public class SystemUserServiceImpl implements SystemUserService {
     }
 
     @Override
-    public long count(LambdaQueryWrapper<SystemUser> queryWrapper) {
-        String username = null;
-        for (Object v : queryWrapper.getParamNameValuePairs().values()) {
-            if (v instanceof String) {
-                username = (String) v;
-            }
-        }
+    public boolean isUserNameAvailable(String username) {
         Result<Boolean> result = systemUserClient.isUserNameAvailable(username);
-        Boolean available = result.getData();
-        return Boolean.TRUE.equals(available) ? 0L : 1L;
+        return Boolean.TRUE.equals(result.getData());
     }
 
     @Override
-    public boolean update(LambdaUpdateWrapper<SystemUser> updateWrapper) {
-        Long id = null;
-        BaseStatus status = null;
-        for (Object v : updateWrapper.getParamNameValuePairs().values()) {
-            if (v instanceof Long) {
-                id = (Long) v;
-            } else if (v instanceof BaseStatus) {
-                status = (BaseStatus) v;
-            }
-        }
+    public boolean updateStatusById(Long id, BaseStatus status) {
         systemUserClient.updateStatusByUserId(id, status);
         return true;
     }

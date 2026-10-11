@@ -41,4 +41,13 @@ public class LeaseAgreementServiceImpl extends ServiceImpl<LeaseAgreementMapper,
         wrapper.eq(LeaseAgreement::getPhone, phone);
         return this.list(wrapper);
     }
+
+    @Override
+    public void expireLeaseAgreement() {
+        LambdaUpdateWrapper<LeaseAgreement> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.le(LeaseAgreement::getLeaseEndDate, new java.util.Date());
+        wrapper.in(LeaseAgreement::getStatus, LeaseStatus.SIGNED, LeaseStatus.WITHDRAWING);
+        wrapper.set(LeaseAgreement::getStatus, LeaseStatus.EXPIRED);
+        this.update(wrapper);
+    }
 }

@@ -1,7 +1,6 @@
 package com.atguigu.lease.web.admin.service;
 
 import com.atguigu.lease.model.entity.FeeValue;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 import java.io.Serializable;
 
@@ -15,6 +14,4 @@ public interface FeeValueService {
     boolean saveOrUpdate(FeeValue feeValue);
 
     boolean removeById(Serializable id);
-
-    boolean remove(LambdaQueryWrapper<FeeValue> wrapper);
 }

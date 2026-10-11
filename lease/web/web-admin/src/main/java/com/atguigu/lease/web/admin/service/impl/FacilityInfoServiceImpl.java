@@ -4,7 +4,6 @@ import com.atguigu.lease.api.apartment.FacilityClient;
 import com.atguigu.lease.model.entity.FacilityInfo;
 import com.atguigu.lease.model.enums.ItemType;
 import com.atguigu.lease.web.admin.service.FacilityInfoService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +17,7 @@ public class FacilityInfoServiceImpl implements FacilityInfoService {
     private FacilityClient facilityClient;
 
     @Override
-    public List<FacilityInfo> list(LambdaQueryWrapper<FacilityInfo> queryWrapper) {
-        ItemType type = (ItemType) queryWrapper.getParamNameValuePairs().values().stream()
-                .filter(v -> v instanceof ItemType).findFirst().orElse(null);
+    public List<FacilityInfo> listByType(ItemType type) {
         return facilityClient.listFacility(type).getData();
     }
 

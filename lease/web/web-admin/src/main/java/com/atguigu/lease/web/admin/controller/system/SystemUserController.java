@@ -7,8 +7,6 @@ import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.web.admin.service.SystemUserService;
 import com.atguigu.lease.model.vo.system.user.SystemUserItemVo;
 import com.atguigu.lease.model.vo.system.user.SystemUserQueryVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,10 +52,7 @@ public class SystemUserController {
     @Operation(summary = "判断后台用户名是否可用")
     @GetMapping("isUserNameAvailable")
     public Result<Boolean> isUsernameExists(@RequestParam String username) {
-        LambdaQueryWrapper<SystemUser> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(SystemUser::getUsername, username);
-        long count = systemUserService.count(queryWrapper);
-        return Result.ok(count == 0);
+        return Result.ok(systemUserService.isUserNameAvailable(username));
     }
 
     @DeleteMapping("deleteById")
@@ -70,10 +65,7 @@ public class SystemUserController {
     @Operation(summary = "根据ID修改后台用户状态")
     @PostMapping("updateStatusByUserId")
     public Result updateStatusByUserId(@RequestParam Long id, @RequestParam BaseStatus status) {
-        LambdaUpdateWrapper<SystemUser> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(SystemUser::getId, id);
-        updateWrapper.set(SystemUser::getStatus, status);
-        systemUserService.update(updateWrapper);
+        systemUserService.updateStatusById(id, status);
         return Result.ok();
     }
 }

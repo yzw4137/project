@@ -1,7 +1,7 @@
 package com.atguigu.lease.web.admin.service;
 
 import com.atguigu.lease.model.entity.SystemPost;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.atguigu.lease.model.enums.BaseStatus;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -24,5 +24,5 @@ public interface SystemPostService {
 
     List<SystemPost> list();
 
-    boolean update(LambdaUpdateWrapper<SystemPost> updateWrapper);
+    boolean updateStatusByPostId(Long id, BaseStatus status);
 }
