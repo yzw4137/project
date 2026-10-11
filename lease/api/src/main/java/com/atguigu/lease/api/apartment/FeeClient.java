@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(value = "service-apartment")
+@FeignClient(value = "service-apartment", contextId = "feeClient")
 public interface FeeClient {
 
     @PostMapping("/fee/key/saveOrUpdate")

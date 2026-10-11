@@ -5,16 +5,19 @@ import com.atguigu.lease.model.vo.room.RoomDetailVo;
 import com.atguigu.lease.model.vo.room.RoomItemVo;
 import com.atguigu.lease.model.vo.room.RoomQueryVo;
 import com.atguigu.lease.model.vo.room.RoomSubmitVo;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
 * @author liubo
 * @description 针对表【room_info(房间信息表)】的数据库操作Service
 * @createDate 2023-07-24 15:48:00
 */
-public interface RoomInfoService extends IService<RoomInfo> {
+public interface RoomInfoService {
 
     void saveOrUpdateRoom(RoomSubmitVo roomSubmitVo);
 
@@ -23,4 +26,8 @@ public interface RoomInfoService extends IService<RoomInfo> {
     RoomDetailVo getRoomDetailById(Long id);
 
     void removeRoomById(Long id);
+
+    boolean update(LambdaUpdateWrapper<RoomInfo> updateWrapper);
+
+    List<RoomInfo> list(LambdaQueryWrapper<RoomInfo> queryWrapper);
 }

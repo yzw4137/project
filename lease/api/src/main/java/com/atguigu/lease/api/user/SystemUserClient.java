@@ -5,15 +5,16 @@ import com.atguigu.lease.model.entity.SystemUser;
 import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.model.vo.system.user.SystemUserItemVo;
 import com.atguigu.lease.model.vo.system.user.SystemUserQueryVo;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(value = "service-user")
+@FeignClient(value = "service-user", contextId = "systemUserClient")
 public interface SystemUserClient {
 
     @GetMapping("/system/user/page")
-    Result<IPage<SystemUserItemVo>> page(@RequestParam("current") long current, @RequestParam("size") long size, SystemUserQueryVo queryVo);
+    Result<Page<SystemUserItemVo>> page(@RequestParam("current") long current, @RequestParam("size") long size, @SpringQueryMap SystemUserQueryVo queryVo);
 
     @GetMapping("/system/user/getById")
     Result<SystemUserItemVo> getById(@RequestParam("id") Long id);

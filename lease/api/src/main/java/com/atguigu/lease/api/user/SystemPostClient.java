@@ -3,17 +3,17 @@ package com.atguigu.lease.api.user;
 import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.SystemPost;
 import com.atguigu.lease.model.enums.BaseStatus;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(value = "service-user")
+@FeignClient(value = "service-user", contextId = "systemPostClient")
 public interface SystemPostClient {
 
     @GetMapping("/system/post/page")
-    Result<IPage<SystemPost>> page(@RequestParam("current") long current, @RequestParam("size") long size);
+    Result<Page<SystemPost>> page(@RequestParam("current") long current, @RequestParam("size") long size);
 
     @PostMapping("/system/post/saveOrUpdate")
     Result saveOrUpdate(@RequestBody SystemPost systemPost);

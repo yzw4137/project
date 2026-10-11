@@ -28,7 +28,7 @@ public class SystemPostController {
     @GetMapping("page")
     private Result<IPage<SystemPost>> page(@RequestParam long current, @RequestParam long size) {
         Page<SystemPost> page = new Page<>(current, size);
-        Page<SystemPost> page1 = systemPostService.page(page);
+        IPage<SystemPost> page1 = systemPostService.page(page);
         return Result.ok(page1);
     }
 

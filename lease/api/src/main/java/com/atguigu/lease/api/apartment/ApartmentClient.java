@@ -8,20 +8,21 @@ import com.atguigu.lease.model.vo.apartment.ApartmentItemVo;
 import com.atguigu.lease.model.vo.apartment.ApartmentQueryVo;
 import com.atguigu.lease.model.vo.apartment.ApartmentSubmitVo;
 import com.atguigu.lease.model.vo.apartment.AppApartmentDetailVo;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(value = "service-apartment")
+@FeignClient(value = "service-apartment", contextId = "apartmentClient")
 public interface ApartmentClient {
 
     @PostMapping("/apartment/saveOrUpdate")
     Result saveOrUpdate(@RequestBody ApartmentSubmitVo apartmentSubmitVo);
 
     @GetMapping("/apartment/pageItem")
-    Result<IPage<ApartmentItemVo>> pageItem(@RequestParam("current") long current, @RequestParam("size") long size, ApartmentQueryVo queryVo);
+    Result<Page<ApartmentItemVo>> pageItem(@RequestParam("current") long current, @RequestParam("size") long size, @SpringQueryMap ApartmentQueryVo queryVo);
 
     @GetMapping("/apartment/getDetailById")
     Result<ApartmentDetailVo> getDetailById(@RequestParam("id") Long id);

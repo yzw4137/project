@@ -4,7 +4,6 @@ import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.SystemPost;
 import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.service.user.service.SystemPostService;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,9 +22,9 @@ public class SystemPostController {
 
     @GetMapping("page")
     @Operation(summary = "分页获取岗位信息")
-    public Result<IPage<SystemPost>> page(@RequestParam long current, @RequestParam long size) {
+    public Result<Page<SystemPost>> page(@RequestParam long current, @RequestParam long size) {
         Page<SystemPost> page = new Page<>(current, size);
-        return Result.ok(systemPostService.page(page));
+        return Result.ok((Page<SystemPost>) systemPostService.page(page));
     }
 
     @PostMapping("saveOrUpdate")

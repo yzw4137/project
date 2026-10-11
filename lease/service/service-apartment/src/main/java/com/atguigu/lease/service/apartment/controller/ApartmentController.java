@@ -12,7 +12,6 @@ import com.atguigu.lease.model.vo.apartment.AppApartmentDetailVo;
 import com.atguigu.lease.service.apartment.service.ApartmentInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,10 +38,9 @@ public class ApartmentController {
 
     @Operation(summary = "根据条件分页查询公寓列表")
     @GetMapping("pageItem")
-    public Result<IPage<ApartmentItemVo>> pageItem(@RequestParam long current, @RequestParam long size, ApartmentQueryVo queryVo) {
+    public Result<Page<ApartmentItemVo>> pageItem(@RequestParam long current, @RequestParam long size, ApartmentQueryVo queryVo) {
         Page<ApartmentItemVo> page = new Page<>(current, size);
-        IPage<ApartmentItemVo> pageModel = apartmentService.pageItem(page, queryVo);
-        return Result.ok(pageModel);
+        return Result.ok((Page<ApartmentItemVo>) apartmentService.pageItem(page, queryVo));
     }
 
     @Operation(summary = "根据ID获取公寓详细信息")

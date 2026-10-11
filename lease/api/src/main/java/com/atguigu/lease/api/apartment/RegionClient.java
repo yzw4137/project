@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(value = "service-apartment")
+@FeignClient(value = "service-apartment", contextId = "regionClient")
 public interface RegionClient {
 
     @GetMapping("/region/province/list")

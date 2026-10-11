@@ -14,7 +14,6 @@ import com.atguigu.lease.model.vo.room.AppRoomQueryVo;
 import com.atguigu.lease.service.apartment.service.RoomInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,9 +39,9 @@ public class RoomController {
 
     @Operation(summary = "根据条件分页查询房间列表")
     @GetMapping("pageItem")
-    public Result<IPage<RoomItemVo>> pageItem(@RequestParam long current, @RequestParam long size, RoomQueryVo queryVo) {
+    public Result<Page<RoomItemVo>> pageItem(@RequestParam long current, @RequestParam long size, RoomQueryVo queryVo) {
         Page<RoomItemVo> page = new Page<>(current, size);
-        IPage<RoomItemVo> result = service.pageRoomItemByQuery(page, queryVo);
+        Page<RoomItemVo> result = (Page<RoomItemVo>) service.pageRoomItemByQuery(page, queryVo);
         return Result.ok(result);
     }
 
@@ -82,16 +81,16 @@ public class RoomController {
 
     @Operation(summary = "[APP]分页查询房间列表")
     @GetMapping("app/pageItem")
-    public Result<IPage<AppRoomItemVo>> pageAppItem(@RequestParam long current, @RequestParam long size, AppRoomQueryVo queryVo) {
+    public Result<Page<AppRoomItemVo>> pageAppItem(@RequestParam long current, @RequestParam long size, AppRoomQueryVo queryVo) {
         Page<AppRoomItemVo> page = new Page<>(current, size);
-        return Result.ok(service.pageItem(page, queryVo));
+        return Result.ok((Page<AppRoomItemVo>) service.pageItem(page, queryVo));
     }
 
     @Operation(summary = "[APP]根据公寓id分页查询房间列表")
     @GetMapping("app/pageItemByApartmentId")
-    public Result<IPage<AppRoomItemVo>> pageAppItemByApartmentId(@RequestParam long current, @RequestParam long size, @RequestParam Long id) {
+    public Result<Page<AppRoomItemVo>> pageAppItemByApartmentId(@RequestParam long current, @RequestParam long size, @RequestParam Long id) {
         Page<AppRoomItemVo> page = new Page<>(current, size);
-        return Result.ok(service.pageItemByApartmentId(page, id));
+        return Result.ok((Page<AppRoomItemVo>) service.pageItemByApartmentId(page, id));
     }
 
     @Operation(summary = "[APP]根据id获取房间详细信息")

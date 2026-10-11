@@ -5,7 +5,6 @@ import com.atguigu.lease.model.entity.UserInfo;
 import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.model.vo.user.UserInfoQueryVo;
 import com.atguigu.lease.service.user.service.UserInfoService;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,9 +27,9 @@ public class UserInfoController {
 
     @GetMapping("page")
     @Operation(summary = "分页查询用户信息")
-    public Result<IPage<UserInfo>> pageUserInfo(@RequestParam long current, @RequestParam long size, UserInfoQueryVo queryVo) {
+    public Result<Page<UserInfo>> pageUserInfo(@RequestParam long current, @RequestParam long size, UserInfoQueryVo queryVo) {
         Page<UserInfo> page = new Page<>(current, size);
-        return Result.ok(userInfoService.pageUserInfo(page, queryVo));
+        return Result.ok((Page<UserInfo>) userInfoService.pageUserInfo(page, queryVo));
     }
 
     @PostMapping("updateStatusById")

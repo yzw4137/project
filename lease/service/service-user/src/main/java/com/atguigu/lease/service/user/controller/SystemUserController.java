@@ -6,7 +6,6 @@ import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.model.vo.system.user.SystemUserItemVo;
 import com.atguigu.lease.model.vo.system.user.SystemUserQueryVo;
 import com.atguigu.lease.service.user.service.SystemUserService;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,9 +22,9 @@ public class SystemUserController {
 
     @GetMapping("page")
     @Operation(summary = "根据条件分页查询后台用户列表")
-    public Result<IPage<SystemUserItemVo>> page(@RequestParam long current, @RequestParam long size, SystemUserQueryVo queryVo) {
+    public Result<Page<SystemUserItemVo>> page(@RequestParam long current, @RequestParam long size, SystemUserQueryVo queryVo) {
         Page<SystemUserItemVo> page = new Page<>(current, size);
-        return Result.ok(systemUserService.pageSystemUser(page, queryVo));
+        return Result.ok((Page<SystemUserItemVo>) systemUserService.pageSystemUser(page, queryVo));
     }
 
     @GetMapping("getById")

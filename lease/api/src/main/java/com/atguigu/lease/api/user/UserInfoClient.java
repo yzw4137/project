@@ -4,18 +4,19 @@ import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.UserInfo;
 import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.model.vo.user.UserInfoQueryVo;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(value = "service-user")
+@FeignClient(value = "service-user", contextId = "userInfoClient")
 public interface UserInfoClient {
 
     @GetMapping("/user/info")
     Result<UserInfo> getUserInfo(@RequestParam("userId") Long userId);
 
     @GetMapping("/user/page")
-    Result<IPage<UserInfo>> pageUserInfo(@RequestParam("current") long current, @RequestParam("size") long size, UserInfoQueryVo queryVo);
+    Result<Page<UserInfo>> pageUserInfo(@RequestParam("current") long current, @RequestParam("size") long size, @SpringQueryMap UserInfoQueryVo queryVo);
 
     @PostMapping("/user/updateStatusById")
     Result updateStatusById(@RequestParam("id") Long id, @RequestParam("status") BaseStatus status);

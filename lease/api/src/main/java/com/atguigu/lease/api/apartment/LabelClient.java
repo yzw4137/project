@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(value = "service-apartment")
+@FeignClient(value = "service-apartment", contextId = "labelClient")
 public interface LabelClient {
 
     @GetMapping("/label/list")

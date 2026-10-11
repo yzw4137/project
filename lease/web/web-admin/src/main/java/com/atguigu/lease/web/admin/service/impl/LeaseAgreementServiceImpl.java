@@ -11,8 +11,7 @@ import com.atguigu.lease.model.enums.LeaseStatus;
 import com.atguigu.lease.model.vo.lease.AgreementQueryVo;
 import com.atguigu.lease.web.admin.service.LeaseAgreementService;
 import com.atguigu.lease.web.admin.vo.agreement.AgreementVo;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
@@ -51,7 +50,7 @@ public class LeaseAgreementServiceImpl implements LeaseAgreementService {
 
     @Override
     public IPage<AgreementVo> pageAgreement(Page<AgreementVo> page, AgreementQueryVo queryVo) {
-        Result<IPage<LeaseAgreement>> result = leaseAgreementClient.page(page.getCurrent(), page.getSize(), queryVo);
+        Result<Page<LeaseAgreement>> result = leaseAgreementClient.page(page.getCurrent(), page.getSize(), queryVo);
         IPage<LeaseAgreement> data = result.getData();
         Page<AgreementVo> ret = new Page<>(data.getCurrent(), data.getSize(), data.getTotal());
         List<AgreementVo> records = new ArrayList<>();
@@ -107,7 +106,7 @@ public class LeaseAgreementServiceImpl implements LeaseAgreementService {
     }
 
     @Override
-    public boolean update(Wrapper<LeaseAgreement> updateWrapper) {
+    public boolean update(LambdaUpdateWrapper<LeaseAgreement> updateWrapper) {
         Long id = null;
         LeaseStatus status = null;
         for (Object v : updateWrapper.getParamNameValuePairs().values()) {
@@ -119,45 +118,5 @@ public class LeaseAgreementServiceImpl implements LeaseAgreementService {
         }
         leaseAgreementClient.updateStatusById(id, status);
         return true;
-    }
-
-    @Override
-    public BaseMapper<LeaseAgreement> getBaseMapper() {
-        return null;
-    }
-
-    @Override
-    public Class<LeaseAgreement> getEntityClass() {
-        return LeaseAgreement.class;
-    }
-
-    @Override
-    public boolean saveBatch(java.util.Collection<LeaseAgreement> entityList, int batchSize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean saveOrUpdateBatch(java.util.Collection<LeaseAgreement> entityList, int batchSize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean updateBatchById(java.util.Collection<LeaseAgreement> entityList, int batchSize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public LeaseAgreement getOne(Wrapper<LeaseAgreement> queryWrapper, boolean throwEx) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public java.util.Map<String, Object> getMap(Wrapper<LeaseAgreement> queryWrapper) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <V> V getObj(Wrapper<LeaseAgreement> queryWrapper, java.util.function.Function<? super Object, V> mapper) {
-        throw new UnsupportedOperationException();
     }
 }

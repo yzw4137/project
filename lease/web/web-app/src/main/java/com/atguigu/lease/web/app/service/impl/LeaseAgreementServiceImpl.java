@@ -16,8 +16,7 @@ import com.atguigu.lease.model.vo.room.AppRoomDetailVo;
 import com.atguigu.lease.web.app.service.LeaseAgreementService;
 import com.atguigu.lease.web.app.vo.agreement.AgreementDetailVo;
 import com.atguigu.lease.web.app.vo.agreement.AgreementItemVo;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -131,7 +130,7 @@ public class LeaseAgreementServiceImpl implements LeaseAgreementService {
     }
 
     @Override
-    public boolean update(Wrapper<LeaseAgreement> updateWrapper) {
+    public boolean update(LambdaUpdateWrapper<LeaseAgreement> updateWrapper) {
         Long id = null;
         LeaseStatus status = null;
         for (Object v : updateWrapper.getParamNameValuePairs().values()) {
@@ -143,45 +142,5 @@ public class LeaseAgreementServiceImpl implements LeaseAgreementService {
         }
         leaseAgreementClient.updateStatusById(id, status);
         return true;
-    }
-
-    @Override
-    public BaseMapper<LeaseAgreement> getBaseMapper() {
-        return null;
-    }
-
-    @Override
-    public Class<LeaseAgreement> getEntityClass() {
-        return LeaseAgreement.class;
-    }
-
-    @Override
-    public boolean saveBatch(java.util.Collection<LeaseAgreement> entityList, int batchSize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean saveOrUpdateBatch(java.util.Collection<LeaseAgreement> entityList, int batchSize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean updateBatchById(java.util.Collection<LeaseAgreement> entityList, int batchSize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public LeaseAgreement getOne(Wrapper<LeaseAgreement> queryWrapper, boolean throwEx) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public java.util.Map<String, Object> getMap(Wrapper<LeaseAgreement> queryWrapper) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <V> V getObj(Wrapper<LeaseAgreement> queryWrapper, java.util.function.Function<? super Object, V> mapper) {
-        throw new UnsupportedOperationException();
     }
 }

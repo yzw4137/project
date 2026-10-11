@@ -5,8 +5,7 @@ import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.SystemPost;
 import com.atguigu.lease.model.enums.BaseStatus;
 import com.atguigu.lease.web.admin.service.SystemPostService;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ public class SystemPostServiceImpl implements SystemPostService {
 
     @Override
     public IPage<SystemPost> page(Page<SystemPost> page) {
-        Result<IPage<SystemPost>> result = systemPostClient.page(page.getCurrent(), page.getSize());
+        Result<Page<SystemPost>> result = systemPostClient.page(page.getCurrent(), page.getSize());
         return result.getData();
     }
 
@@ -51,7 +50,7 @@ public class SystemPostServiceImpl implements SystemPostService {
     }
 
     @Override
-    public boolean update(Wrapper<SystemPost> updateWrapper) {
+    public boolean update(LambdaUpdateWrapper<SystemPost> updateWrapper) {
         Long id = null;
         BaseStatus status = null;
         for (Object v : updateWrapper.getParamNameValuePairs().values()) {
@@ -63,50 +62,5 @@ public class SystemPostServiceImpl implements SystemPostService {
         }
         systemPostClient.updateStatusByPostId(id, status);
         return true;
-    }
-
-    @Override
-    public BaseMapper<SystemPost> getBaseMapper() {
-        return null;
-    }
-
-    @Override
-    public Class<SystemPost> getEntityClass() {
-        return SystemPost.class;
-    }
-
-    @Override
-    public boolean saveBatch(java.util.Collection<SystemPost> entityList, int batchSize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean saveOrUpdateBatch(java.util.Collection<SystemPost> entityList, int batchSize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean updateBatchById(java.util.Collection<SystemPost> entityList, int batchSize) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean saveOrUpdate(SystemPost entity) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public SystemPost getOne(Wrapper<SystemPost> queryWrapper, boolean throwEx) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public java.util.Map<String, Object> getMap(Wrapper<SystemPost> queryWrapper) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <V> V getObj(Wrapper<SystemPost> queryWrapper, java.util.function.Function<? super Object, V> mapper) {
-        throw new UnsupportedOperationException();
     }
 }

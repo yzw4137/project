@@ -6,17 +6,18 @@ import com.atguigu.lease.model.enums.AppointmentStatus;
 import com.atguigu.lease.model.vo.appointment.AppointmentItemVo;
 import com.atguigu.lease.model.vo.appointment.AppointmentQueryVo;
 import com.atguigu.lease.model.vo.appointment.AppointmentVo;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(value = "service-user")
+@FeignClient(value = "service-user", contextId = "viewAppointmentClient")
 public interface ViewAppointmentClient {
 
     @GetMapping("/appointment/page")
-    Result<IPage<AppointmentVo>> page(@RequestParam("current") long current, @RequestParam("size") long size, AppointmentQueryVo queryVo);
+    Result<Page<AppointmentVo>> page(@RequestParam("current") long current, @RequestParam("size") long size, @SpringQueryMap AppointmentQueryVo queryVo);
 
     @PostMapping("/appointment/updateStatusById")
     Result updateStatusById(@RequestParam("id") Long id, @RequestParam("status") AppointmentStatus status);
