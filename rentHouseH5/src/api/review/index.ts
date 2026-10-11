@@ -48,10 +48,14 @@ export function toggleReviewLike(id: number | string) {
 /**
  * @description 查询评价的评论列表
  * @param reviewId 评价id
+ * @param sortType 排序方式：latest 最新 / hot 最热
  */
-export function getCommentList(reviewId: number | string) {
+export function getCommentList(
+  reviewId: number | string,
+  sortType: "latest" | "hot" = "latest"
+) {
   return http.get<CommentItemInterface[]>(
-    `/app/review/comment/list?reviewId=${reviewId}`
+    `/app/review/comment/list?reviewId=${reviewId}&sortType=${sortType}`
   );
 }
 
@@ -60,6 +64,14 @@ export function getCommentList(reviewId: number | string) {
  */
 export function saveComment(params: CommentSubmitInterface) {
   return http.post(`/app/review/comment/save`, params);
+}
+
+/**
+ * @description 点赞 / 取消点赞评论
+ * @param id 评论id
+ */
+export function toggleCommentLike(id: number | string) {
+  return http.post(`/app/review/comment/like`, { id });
 }
 
 /**

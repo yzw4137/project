@@ -38,6 +38,8 @@ export interface ReviewItemInterface {
 
 // 评价查询参数（圈子分页）
 export interface ReviewQueryInterface extends ReqPage {
+  // 排序方式：latest 最新 / hot 最热
+  sortType?: "latest" | "hot";
   // 可选：按公寓id筛选
   apartmentId?: number | string;
 }
@@ -67,6 +69,12 @@ export interface CommentItemInterface {
   parentId: number | string | null;
   // 被回复用户昵称（用于展示 "回复 xxx:"）
   replyToNickname?: string;
+  // 点赞数
+  likeCount?: number;
+  // 当前用户是否已点赞
+  isLiked?: boolean;
+  // 是否为当前用户发布的评论
+  isMine?: boolean;
 }
 
 // 发布评论请求参数
