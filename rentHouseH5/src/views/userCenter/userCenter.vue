@@ -58,6 +58,11 @@ const navList = ref([
     icon: "合同",
     name: "我的租约",
     path: "/myAgreement"
+  },
+  {
+    icon: "评价",
+    name: "我的评价",
+    path: "/myReview"
   }
 ]);
 const userStore = useUserStore();

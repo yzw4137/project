@@ -1,5 +1,6 @@
 package com.atguigu.lease.web.app.service;
 
+import com.atguigu.lease.model.vo.apartment.AppApartmentDetailVo;
 import com.atguigu.lease.model.vo.apartment.AppApartmentItemVo;
 
 /**
@@ -10,4 +11,6 @@ import com.atguigu.lease.model.vo.apartment.AppApartmentItemVo;
 public interface ApartmentInfoService {
 
     AppApartmentItemVo selectApartmentItemVoById(Long apartmentId);
+
+    AppApartmentDetailVo getDetailById(Long id);
 }

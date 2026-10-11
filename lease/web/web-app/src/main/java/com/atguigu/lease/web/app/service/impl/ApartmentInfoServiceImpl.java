@@ -26,6 +26,7 @@ public class ApartmentInfoServiceImpl implements ApartmentInfoService {
         return dst;
     }
 
+    @Override
     public AppApartmentDetailVo getDetailById(Long id) {
         return apartmentClient.getAppDetailById(id).getData();
     }

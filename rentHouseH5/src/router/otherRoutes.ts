@@ -77,6 +77,24 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    name: "MyReview",
+    path: "/myReview",
+    component: () => import("@/views/myReview/myReview.vue"),
+    meta: {
+      title: "我的评价",
+      noCache: true
+    }
+  },
+  {
+    name: "PublishReview",
+    path: "/publishReview",
+    component: () => import("@/views/publishReview/publishReview.vue"),
+    meta: {
+      title: "发布评价",
+      noCache: true
+    }
+  },
+  {
     name: "Login",
     path: "/login",
     component: () => import("@/views/login/login.vue"),

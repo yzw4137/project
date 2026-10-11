@@ -139,6 +139,13 @@
               @click="rentRefundHandle(item)"
               >提前退租</van-button
             >
+            <van-button
+              v-if="canReview(item)"
+              size="mini"
+              type="primary"
+              @click="goPublishReview(item)"
+              >评价</van-button
+            >
           </div>
         </template>
       </van-card>
@@ -176,6 +183,23 @@ const goAgreementDetail = (
   router.push({
     path: "/agreement",
     query: { id: item.id, ...query }
+  });
+};
+// 可发布评价的租约状态：已签约、已到期、已退租
+const canReview = (item: AgreementItemInterface) =>
+  item.leaseStatus === AgreementStatus.SIGNED ||
+  item.leaseStatus === AgreementStatus.EXPIRED ||
+  item.leaseStatus === AgreementStatus.CONFIRMED;
+// 跳转到发布评价页
+const goPublishReview = (item: AgreementItemInterface) => {
+  router.push({
+    path: "/publishReview",
+    query: {
+      agreementId: item.id,
+      apartmentName: item.apartmentName,
+      roomNumber: item.roomNumber,
+      graphUrl: item.roomGraphVoList?.[0]?.url || ""
+    }
   });
 };
 // 提前退租
