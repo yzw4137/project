@@ -95,6 +95,15 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    name: "MessageList",
+    path: "/messageList",
+    component: () => import("@/views/messageList/messageList.vue"),
+    meta: {
+      title: "消息列表",
+      noCache: true
+    }
+  },
+  {
     name: "Login",
     path: "/login",
     component: () => import("@/views/login/login.vue"),

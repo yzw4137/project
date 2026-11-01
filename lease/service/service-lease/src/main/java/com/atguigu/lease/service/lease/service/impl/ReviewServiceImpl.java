@@ -6,6 +6,7 @@ import com.atguigu.lease.model.enums.LeaseStatus;
 import com.atguigu.lease.model.vo.graph.GraphVo;
 import com.atguigu.lease.model.vo.review.*;
 import com.atguigu.lease.service.lease.mapper.*;
+import com.atguigu.lease.service.lease.service.MessageService;
 import com.atguigu.lease.service.lease.service.ReviewService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -39,6 +40,8 @@ public class ReviewServiceImpl implements ReviewService {
     private RoomInfoMapper roomInfoMapper;
     @Autowired
     private LeaseAgreementMapper leaseAgreementMapper;
+    @Autowired
+    private MessageService messageService;
     @Autowired
     private StringRedisTemplate redis;
 
@@ -181,6 +184,11 @@ public class ReviewServiceImpl implements ReviewService {
             } catch (Exception ignore) {
                 // 唯一索引冲突说明已存在，忽略
             }
+            // 生成点赞消息（取消点赞不生成）
+            ReviewInfo info = reviewInfoMapper.selectById(reviewId);
+            if (info != null) {
+                messageService.send(info.getUserId(), 3, userId, "赞了你的评价", "review", reviewId);
+            }
         } else {
             // 取消：原子 -1
             redis.opsForZSet().incrementScore(LIKE_COUNT_KEY, String.valueOf(reviewId), -1);
@@ -239,6 +247,17 @@ public class ReviewServiceImpl implements ReviewService {
         }
         // 加入该评价的评论点赞 ZSet（score=0）
         redis.opsForZSet().add(COMMENT_LIKES_KEY + vo.getReviewId(), String.valueOf(comment.getId()), 0);
+
+        // 生成评论/回复消息（自己评论自己不生成，send 内部判断）
+        String summary = abbreviate(vo.getContent());
+        if (vo.getParentId() != null) {
+            ReviewComment parent = reviewCommentMapper.selectById(vo.getParentId());
+            if (parent != null) {
+                messageService.send(parent.getUserId(), 2, userId, "回复了你的评论：" + summary, "review", vo.getReviewId());
+            }
+        } else if (info != null) {
+            messageService.send(info.getUserId(), 2, userId, "评论了你的评价：" + summary, "review", vo.getReviewId());
+        }
     }
 
     @Override
@@ -260,6 +279,8 @@ public class ReviewServiceImpl implements ReviewService {
                 reviewCommentLikeMapper.insert(rcl);
             } catch (Exception ignore) {
             }
+            // 生成点赞消息（取消点赞不生成）
+            messageService.send(comment.getUserId(), 3, userId, "赞了你的评论", "review", comment.getReviewId());
         } else {
             redis.opsForZSet().incrementScore(zKey, String.valueOf(commentId), -1);
             redis.opsForSet().remove(likedKey, String.valueOf(userId));
@@ -289,6 +310,13 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     // ==================== 组装 VO ====================
+
+    private String abbreviate(String content) {
+        if (content == null) {
+            return "";
+        }
+        return content.length() > 30 ? content.substring(0, 30) + "…" : content;
+    }
 
     private ReviewItemVo assemble(ReviewInfo info, Long currentUserId) {
         ReviewItemVo vo = new ReviewItemVo();
