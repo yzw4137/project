@@ -32,15 +32,6 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
-    path: "/myRoom",
-    name: "MyRoom",
-    component: () => import("@/views/myRoom/myRoom.vue"),
-    meta: {
-      title: "我的房间",
-      icon: "home-o"
-    }
-  },
-  {
     path: "/message",
     name: "Message",
     component: () => import("@/views/message/message.vue"),

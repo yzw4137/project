@@ -17,6 +17,11 @@ const routes: Array<RouteRecordRaw> = [
       //  非tabBar页面
       ...otherRoutes
     ]
+  },
+  // 未匹配到路由时重定向到找房页，避免白屏
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/search"
   }
 ];
 

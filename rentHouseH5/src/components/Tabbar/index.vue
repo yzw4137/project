@@ -24,50 +24,6 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 console.log(route);
 const active = ref(0);
-// const tabBarData = reactive([
-//   {
-//     icon: "search",
-//     title: "找房",
-//     to: {
-//       path: "/search"
-//     }
-//   },
-//   {
-//     icon: "star-o",
-//     title: "圈子",
-//     to: {
-//       path: "/group"
-//     }
-//   },
-//   {
-//     icon: "home-o",
-//     title: "我的房间",
-//     to: {
-//       path: "/myRoom"
-//     }
-//   },
-//   {
-//     icon: "comment-o",
-//     title: "消息",
-//     to: {
-//       path: "/message"
-//     }
-//   },
-//   {
-//     icon: "user-o",
-//     title: "个人中心",
-//     to: {
-//       path: "/userCenter"
-//     }
-//   }
-//   // {
-//   //   icon: "user-o",
-//   //   title: "关于",
-//   //   to: {
-//   //     path: "/about"
-//   //   }
-//   // }
-// ]);
 const tabBarData = computed(() => {
   return tabBarRoutes.map(item => {
     return {
