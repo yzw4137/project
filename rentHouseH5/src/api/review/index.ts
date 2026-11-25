@@ -42,7 +42,7 @@ export function saveReview(params: ReviewSubmitInterface) {
  * @param id 评价id
  */
 export function toggleReviewLike(id: number | string) {
-  return http.post(`/app/review/like`, { id });
+  return http.post(`/app/review/like?id=${id}`);
 }
 
 /**
@@ -71,7 +71,7 @@ export function saveComment(params: CommentSubmitInterface) {
  * @param id 评论id
  */
 export function toggleCommentLike(id: number | string) {
-  return http.post(`/app/review/comment/like`, { id });
+  return http.post(`/app/review/comment/like?id=${id}`);
 }
 
 /**

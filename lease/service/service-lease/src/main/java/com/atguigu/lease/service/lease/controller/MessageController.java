@@ -1,5 +1,6 @@
 package com.atguigu.lease.service.lease.controller;
 
+import com.atguigu.lease.common.login.LoginUserHolder;
 import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.vo.message.MessageItemVo;
 import com.atguigu.lease.model.vo.message.MessageOverviewVo;
@@ -19,32 +20,35 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
+    private Long currentUserId() {
+        return LoginUserHolder.getLoginUser().getUserId();
+    }
+
     @Operation(summary = "查询三类消息未读数概览")
     @GetMapping("overview")
-    public Result<MessageOverviewVo> overview(@RequestParam Long userId) {
-        return Result.ok(messageService.overview(userId));
+    public Result<MessageOverviewVo> overview() {
+        return Result.ok(messageService.overview(currentUserId()));
     }
 
     @Operation(summary = "分页查询消息列表（可按类型过滤）")
     @GetMapping("pageItem")
     public Result<Page<MessageItemVo>> pageItem(@RequestParam long current,
                                                 @RequestParam long size,
-                                                @RequestParam(required = false) Integer type,
-                                                @RequestParam Long userId) {
-        return Result.ok(messageService.pageItem(current, size, type, userId));
+                                                @RequestParam(required = false) Integer type) {
+        return Result.ok(messageService.pageItem(current, size, type, currentUserId()));
     }
 
     @Operation(summary = "标记已读（单条或按类型全部）")
     @PostMapping("read")
-    public Result read(@RequestBody MessageReadVo vo, @RequestParam Long userId) {
-        messageService.markRead(vo.getId(), vo.getType(), userId);
+    public Result read(@RequestBody MessageReadVo vo) {
+        messageService.markRead(vo.getId(), vo.getType(), currentUserId());
         return Result.ok();
     }
 
     @Operation(summary = "删除消息")
     @DeleteMapping("removeById")
-    public Result removeById(@RequestParam Long id, @RequestParam Long userId) {
-        messageService.removeById(id, userId);
+    public Result removeById(@RequestParam Long id) {
+        messageService.removeById(id, currentUserId());
         return Result.ok();
     }
 }

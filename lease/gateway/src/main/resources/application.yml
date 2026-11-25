@@ -7,15 +7,54 @@ spring:
   cloud:
     nacos:
       discovery:
-        # Nacos 地址，按实际环境调整（现有 MySQL/Redis 在 192.168.100.101）
         server-addr: 192.168.100.101:8848
     gateway:
       routes:
-        - id: web-admin
-          uri: lb://web-admin
+        # ===== service-user：登录/验证码（不 StripPrefix，路径原样保留给后端区分 app vs admin）=====
+        - id: user-app-login
+          uri: lb://service-user
           predicates:
-            - Path=/admin/**
-        - id: web-app
-          uri: lb://web-app
+            - Path=/app/login/**,/app/info
+        - id: user-admin-login
+          uri: lb://service-user
           predicates:
-            - Path=/app/**
+            - Path=/admin/login/**,/admin/info
+
+        # ===== service-apartment App端 —— 房间/公寓：后端 App 接口带 app/ 前缀，用 RewritePath 对齐 =====
+        - id: apartment-app-routes
+          uri: lb://service-apartment
+          predicates:
+            - Path=/app/room/**,/app/apartment/**
+          filters:
+            - RewritePath=/app/(?<module>room|apartment)/(?<rest>.*), /$\{module}/app/$\{rest}
+
+        # ===== service-apartment —— 区域/配套/标签/租期/支付方式/杂费/文件 + 管理端全部 =====
+        - id: apartment-routes
+          uri: lb://service-apartment
+          predicates:
+            - Path=/app/region/**,/app/term/**,/app/payment/**,/app/attr/**,/app/facility/**,/app/fee/**,/app/label/**,/app/file/**,
+                /admin/apartment/**,/admin/room/**,/admin/region/**,/admin/term/**,/admin/payment/**,/admin/attr/**,/admin/facility/**,/admin/fee/**,/admin/label/**,/admin/file/**
+          filters:
+            - StripPrefix=1
+
+        # ===== service-lease —— 租约/评价/消息 =====
+        - id: lease-routes
+          uri: lb://service-lease
+          predicates:
+            - Path=/app/agreement/**,/app/review/**,/app/message/**,
+                /admin/agreement/**,/admin/review/**,/admin/message/**
+          filters:
+            - StripPrefix=1
+
+        # ===== service-user —— 用户/浏览历史/预约/App端用户管理/系统用户/岗位 =====
+        - id: user-routes
+          uri: lb://service-user
+          predicates:
+            - Path=/app/user/**,/app/history/**,/app/appointment/**,
+                /admin/system/user/**,/admin/system/post/**,/admin/user/**,
+                /admin/appointment/**
+          filters:
+            - StripPrefix=1
+
+  mvc:
+    static-path-pattern: /static/**

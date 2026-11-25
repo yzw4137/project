@@ -1,5 +1,6 @@
 package com.atguigu.lease.service.user.controller;
 
+import com.atguigu.lease.common.login.LoginUserHolder;
 import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.BrowsingHistory;
 import com.atguigu.lease.model.vo.history.HistoryItemVo;
@@ -19,15 +20,17 @@ public class BrowsingHistoryController {
     private BrowsingHistoryService browsingHistoryService;
 
     @GetMapping("pageItem")
-    @Operation(summary = "获取浏览历史")
-    public Result<Page<HistoryItemVo>> pageItem(@RequestParam long current, @RequestParam long size, @RequestParam Long userId) {
+    @Operation(summary = "获取当前登录用户的浏览历史")
+    public Result<Page<HistoryItemVo>> pageItem(@RequestParam long current, @RequestParam long size) {
+        Long userId = LoginUserHolder.getLoginUser().getUserId();
         Page<HistoryItemVo> page = new Page<>(current, size);
         return Result.ok((Page<HistoryItemVo>) browsingHistoryService.pageItemByUserId(page, userId));
     }
 
     @PostMapping("saveHistory")
     @Operation(summary = "保存浏览历史")
-    public Result saveHistory(@RequestParam Long userId, @RequestParam Long roomId) {
+    public Result saveHistory(@RequestParam Long roomId) {
+        Long userId = LoginUserHolder.getLoginUser().getUserId();
         browsingHistoryService.saveHistory(userId, roomId);
         return Result.ok();
     }

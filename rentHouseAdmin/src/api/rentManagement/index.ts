@@ -77,7 +77,7 @@ export function getRoomListByApartmentId(apartmentId: number | string) {
  * @param id
  */
 export function getAgreementInfoById(id: number | string) {
-  return http.get<AgreementInfoInterface>(`/admin/agreement?id=${id}`)
+  return http.get<AgreementInfoInterface>(`/admin/agreement/getById?id=${id}`)
 }
 /**
  * @description 保存或修改租约信息

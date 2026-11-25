@@ -1,5 +1,6 @@
 package com.atguigu.lease.service.lease.controller;
 
+import com.atguigu.lease.common.login.LoginUserHolder;
 import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.vo.review.CommentItemVo;
 import com.atguigu.lease.model.vo.review.CommentSubmitVo;
@@ -23,6 +24,21 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
+    /**
+     * 获取当前登录用户的 userId，未登录时返回 null（用于点赞态判断等可降级的场景）
+     */
+    private Long currentUserIdOrNull() {
+        var user = LoginUserHolder.getLoginUser();
+        return user != null ? user.getUserId() : null;
+    }
+
+    /**
+     * 获取当前登录用户的 userId（必须登录）
+     */
+    private Long currentUserId() {
+        return LoginUserHolder.getLoginUser().getUserId();
+    }
+
     @Operation(summary = "分页查询评价列表（圈子，支持最新/最热排序）")
     @GetMapping("pageItem")
     public Result<Page<ReviewItemVo>> pageItem(@RequestParam long current,
@@ -31,58 +47,57 @@ public class ReviewController {
         return Result.ok(reviewService.pageItem(current, size, queryVo));
     }
 
-    @Operation(summary = "查询当前用户发布的评价列表")
+    @Operation(summary = "查询当前登录用户发布的评价列表")
     @GetMapping("listMyItem")
-    public Result<List<ReviewItemVo>> listMyItem(@RequestParam Long userId) {
-        return Result.ok(reviewService.listMyItem(userId));
+    public Result<List<ReviewItemVo>> listMyItem() {
+        return Result.ok(reviewService.listMyItem(currentUserId()));
     }
 
     @Operation(summary = "根据id查询评价详情")
     @GetMapping("getDetailById")
-    public Result<ReviewItemVo> getDetailById(@RequestParam Long id, @RequestParam(required = false) Long userId) {
-        return Result.ok(reviewService.getDetailById(id, userId));
+    public Result<ReviewItemVo> getDetailById(@RequestParam Long id) {
+        return Result.ok(reviewService.getDetailById(id, currentUserIdOrNull()));
     }
 
     @Operation(summary = "发布评价")
     @PostMapping("save")
-    public Result save(@RequestBody ReviewSubmitVo vo, @RequestParam Long userId) {
-        reviewService.save(vo, userId);
+    public Result save(@RequestBody ReviewSubmitVo vo) {
+        reviewService.save(vo, currentUserId());
         return Result.ok();
     }
 
     @Operation(summary = "点赞/取消点赞评价")
     @PostMapping("like")
-    public Result like(@RequestParam Long id, @RequestParam Long userId) {
-        reviewService.toggleLike(id, userId);
+    public Result like(@RequestParam Long id) {
+        reviewService.toggleLike(id, currentUserId());
         return Result.ok();
     }
 
     @Operation(summary = "查询评价的评论列表（支持最新/最热排序）")
     @GetMapping("comment/list")
     public Result<List<CommentItemVo>> listComment(@RequestParam Long reviewId,
-                                                   @RequestParam(required = false) String sortType,
-                                                   @RequestParam(required = false) Long userId) {
-        return Result.ok(reviewService.listComment(reviewId, sortType, userId));
+                                                   @RequestParam(required = false) String sortType) {
+        return Result.ok(reviewService.listComment(reviewId, sortType, currentUserIdOrNull()));
     }
 
     @Operation(summary = "发表评论")
     @PostMapping("comment/save")
-    public Result saveComment(@RequestBody CommentSubmitVo vo, @RequestParam Long userId) {
-        reviewService.saveComment(vo, userId);
+    public Result saveComment(@RequestBody CommentSubmitVo vo) {
+        reviewService.saveComment(vo, currentUserId());
         return Result.ok();
     }
 
     @Operation(summary = "点赞/取消点赞评论")
     @PostMapping("comment/like")
-    public Result commentLike(@RequestParam Long id, @RequestParam Long userId) {
-        reviewService.toggleCommentLike(id, userId);
+    public Result commentLike(@RequestParam Long id) {
+        reviewService.toggleCommentLike(id, currentUserId());
         return Result.ok();
     }
 
     @Operation(summary = "删除评论")
     @DeleteMapping("comment/removeById")
-    public Result removeComment(@RequestParam Long id, @RequestParam Long userId) {
-        reviewService.removeCommentById(id, userId);
+    public Result removeComment(@RequestParam Long id) {
+        reviewService.removeCommentById(id, currentUserId());
         return Result.ok();
     }
 }

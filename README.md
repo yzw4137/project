@@ -6,7 +6,7 @@
 
 平台围绕「找房—看房—签约—租后」主线设计，用户可通过 H5 端浏览公寓与房间、提交预约看房、查看并签署租赁协议、在圈子中发布房屋评价并点赞评论；管理端则负责公寓、房间、属性字典、租约、预约、用户及系统权限的维护。
 
-后端采用微服务架构，按业务域拆分为用户、公寓、租约三个领域服务，网关统一入口，Web 层作为面向客户端的 BFF 聚合层通过 Feign 调用下游服务。
+后端采用轻量化微服务架构：网关统一入口并集中鉴权，按业务域拆分为用户、公寓、租约三个领域服务，每个服务直接对外暴露 App 端（`/app/**`）与管理端（`/admin/**`）接口并完成自身的数据访问与 VO 富化，已移除原有的 BFF 聚合层与 Feign 服务间调用。
 
 ## 功能特性
 
@@ -47,8 +47,7 @@
 | Spring Boot | 3.0.5 |
 | Spring Cloud | 2022.0.4 |
 | Spring Cloud Alibaba | 2022.0.0.0（Nacos 注册/配置中心） |
-| Spring Cloud Gateway | 统一网关路由 |
-| OpenFeign | 服务间调用（BFF 聚合领域服务） |
+| Spring Cloud Gateway | 统一网关路由 + JWT 鉴权（AuthGlobalFilter） |
 | MyBatis-Plus | 3.5.3.1 |
 | MySQL | 8.x |
 | Redis | 缓存、验证码、点赞计数与热榜（ZSet） |
@@ -73,17 +72,12 @@ flowchart TB
         Admin[后台管理端<br/>rentHouseAdmin]
     end
 
-    GW[Gateway 网关 :8088<br/>/app/** → web-app  /admin/** → web-admin]
-
-    subgraph Web[BFF 聚合层]
-        WebApp[web-app :8081]
-        WebAdmin[web-admin :8080]
-    end
+    GW[Gateway 网关 :8088<br/>路由转发 + JWT 鉴权<br/>access-token → user-id / username 透传]
 
     subgraph Service[领域服务层]
-        SUser[service-user :8082]
-        SApt[service-apartment :8083]
-        SLease[service-lease :8084]
+        SUser[service-user :8082<br/>登录 / 用户 / 预约 / 浏览历史]
+        SApt[service-apartment :8083<br/>公寓 / 房间 / 字典 / 文件]
+        SLease[service-lease :8084<br/>租约 / 评价 / 消息]
     end
 
     subgraph Infra[基础设施]
@@ -93,19 +87,13 @@ flowchart TB
         MinIO[(MinIO :9000)]
     end
 
-    H5 --> GW
-    Admin --> GW
-    GW --> WebApp
-    GW --> WebAdmin
-    WebApp -->|Feign| SUser
-    WebApp -->|Feign| SApt
-    WebApp -->|Feign| SLease
-    WebAdmin -->|Feign| SUser
-    WebAdmin -->|Feign| SApt
-    WebAdmin -->|Feign| SLease
+    H5 -->|/app/**| GW
+    Admin -->|/admin/**| GW
+    GW --> SUser
+    GW --> SApt
+    GW --> SLease
 
-    WebApp -.注册/发现.-> Nacos
-    WebAdmin -.注册/发现.-> Nacos
+    GW -.注册/发现.-> Nacos
     SUser -.注册/发现.-> Nacos
     SApt -.注册/发现.-> Nacos
     SLease -.注册/发现.-> Nacos
@@ -113,20 +101,17 @@ flowchart TB
     SUser --> MySQL
     SApt --> MySQL
     SLease --> MySQL
-    WebApp --> Redis
-    WebAdmin --> Redis
     SUser --> Redis
     SApt --> Redis
     SLease --> Redis
-    WebAdmin --> MinIO
     SApt --> MinIO
 ```
 
 ### 设计约定
-- **三层架构**：网关只做路由转发，Web 层（BFF）只做接口聚合与 Feign 调用，不做数据库访问；领域业务全部下沉到 `service-*` 服务。
-- **数据隔离**：Web 层无持久层代码，数据只由领域服务通过 MyBatis-Plus 读写。
-- **Feign 规范**：每个 Feign 客户端使用唯一 `contextId` 防止 Bean 名冲突；返回值使用具体 `Page` 类而非 `IPage` 抽象类以避免跨服务反序列化失败；GET 多参数方法使用 `@SpringQueryMap` 避免被转换为 POST。
-- **鉴权**：JWT + 拦截器，登录用户信息存于 `LoginUserHolder`（ThreadLocal）。
+- **两层架构**：网关只做路由转发与统一鉴权；领域服务（`service-*`）各自承担 Controller + Service + Mapper 全栈，并直接完成跨实体的 VO 富化（如租约详情内嵌公寓 / 房间 / 图片信息），不再依赖 BFF 聚合。
+- **鉴权下沉**：网关 `AuthGlobalFilter` 统一校验 `access-token`（JWT），白名单路径（登录、接口文档）放行，校验通过后将 `user-id`、`username` 写入请求头透传下游；领域服务通过拦截器解析并填充 `LoginUserHolder`（ThreadLocal）。
+- **路由约定**：App 端房间 / 公寓接口在后端带 `app/` 前缀（如 `/room/app/**`），网关用 `RewritePath` 将 `/app/room/**` 重写为 `/room/app/**`；其余 App / Admin 路由统一 `StripPrefix=1`。
+- **共享模型**：实体、VO、枚举统一放在 `model` 模块，供网关与各领域服务共用；富化 VO（如 `AgreementDetailVo`、`AppointmentItemVo`）也定义在此，由领域服务查询拼装后返回。
 - **点赞与热榜**：评价 / 评论点赞基于 Redis ZSet 的 `ZINCRBY` 原子命令计数，利用 score 排序高效获取 TopN 热帖，避免高并发下频繁写库。
 
 ## 项目结构
@@ -137,16 +122,12 @@ project/
 │   ├── common/                  # 公共模块
 │   │   ├── common-util/         # 通用工具（Result、JWT、登录上下文、异常、常量）
 │   │   └── service-util/        # 服务层通用配置（MyBatis-Plus、Redis、MinIO、短信、全局异常）
-│   ├── model/                   # 实体、VO、枚举等共享模型
-│   ├── api/                     # 各领域服务对外暴露的 Feign 客户端
-│   ├── gateway/                 # Spring Cloud Gateway 网关（:8088）
-│   ├── service/                 # 领域服务层
-│   │   ├── service-user/        # 用户域（:8082）
-│   │   ├── service-apartment/   # 公寓域（:8083）
-│   │   └── service-lease/       # 租约域，含评价/评论、消息模块（:8084）
-│   └── web/                     # BFF 聚合层
-│       ├── web-admin/           # 后台管理端接口（:8080）
-│       └── web-app/             # 用户端接口（:8081）
+│   ├── model/                   # 实体、VO、枚举等共享模型（含富化 VO，如 AgreementDetailVo）
+│   ├── gateway/                 # Spring Cloud Gateway 网关（:8088），含 AuthGlobalFilter 统一鉴权
+│   └── service/                 # 领域服务层（直连 DB，自带 Controller / Service / Mapper）
+│       ├── service-user/        # 用户域：登录 / 用户 / 预约 / 浏览历史 / 系统用户（:8082）
+│       ├── service-apartment/   # 公寓域：公寓 / 房间 / 字典 / 文件上传（:8083）
+│       └── service-lease/       # 租约域：租约 / 评价评论 / 消息通知（:8084）
 ├── rentHouseAdmin/              # 后台管理端前端（Vue3 + Element Plus）
 ├── rentHouseH5/                 # 用户端 H5 前端（Vue3 + Vant）
 ├── 评价模块建表脚本.sql          # 评价/评论相关建表语句
@@ -186,13 +167,10 @@ mvn -DskipTests clean install
 # 依次启动（建议顺序）
 # 1. 网关
 java -jar gateway/target/*.jar
-# 2. 领域服务
+# 2. 领域服务（顺序不限，均需先注册到 Nacos）
 java -jar service/service-user/target/*.jar
 java -jar service/service-apartment/target/*.jar
 java -jar service/service-lease/target/*.jar
-# 3. BFF 聚合层
-java -jar web/web-admin/target/*.jar
-java -jar web/web-app/target/*.jar
 ```
 
 也可在 IDE 中直接运行各模块的 `*Application` 主类（需先 `mvn install` 安装公共模块）。
@@ -262,11 +240,13 @@ cd rentHouseAdmin && npm run build
 
 ## 常见问题
 
-- **启动报 Nacos `UNHEALTHY` / 连接失败**：确认 Nacos 已启动且地址可达，所有服务均依赖它。
-- **Feign 405 Method Not Allowed**：GET 多参数 Feign 方法需加 `@SpringQueryMap`。
-- **Feign 返回值反序列化失败**：返回类型需使用具体 `Page` 类，不能用 `IPage`。
-- **Bean 名称冲突 / 启动失败**：每个 Feign 客户端需指定唯一 `contextId`。
+- **启动报 Nacos `UNHEALTHY` / 连接失败**：确认 Nacos 已启动且地址可达，所有服务均依赖它进行注册与发现。
+- **App 端房间 / 公寓接口 404**：后端 App 接口路径带 `app/` 前缀（如 `/room/app/getDetailById`），前端经网关访问时使用 `/app/room/getDetailById`，由网关 `RewritePath` 重写；确认网关路由配置未缺失。
+- **接口返回 401 未登录**：除白名单（`/app/login`、`/admin/login`、接口文档）外，网关要求请求头携带 `access-token`；登录成功后前端会自动写入该头。
+- **修改公共模块 / model 后不生效**：`model` 与 `common-util` 被各服务依赖，改动后需先重新构建（`mvn -pl model,service/service-lease -am package -DskipTests`）并重启对应服务，运行中的 jar 不会自动更新。
 - **推送 GitHub 连接重置**：HTTPS 推送网络不稳时，可为 git 配置本地代理（见 `git-proxy-on.bat` / `git-proxy-off.bat`），或改用 SSH 远程。
+
+> 开发环境登录约定：App 端短信验证码固定为 `123456`（无需真实发短信，`getCode` 仅打印），JWT 有效期为 30 天，便于本地联调。
 
 ## 说明
 

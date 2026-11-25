@@ -202,7 +202,9 @@ async function getAppointmentDetailHandle() {
   // 单独处理日期
   dateInfo.value.date = data.appointmentTime.split(" ")[0].split("-");
   dateInfo.value.time = data.appointmentTime.split(" ")[1].split(":");
-  apartmentDetailInfo.value = data.apartmentItemVo;
+  // 公寓详情单独查询（后端预约详情为裸实体，不内嵌 apartmentItemVo）
+  const aptRes = await getApartmentDetailById((data as any).apartmentId);
+  apartmentDetailInfo.value = aptRes.data;
 }
 onMounted(async () => {
   route.query.apartmentId && (await getApartmentDetailHandle());

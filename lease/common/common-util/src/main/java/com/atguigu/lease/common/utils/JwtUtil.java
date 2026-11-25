@@ -12,9 +12,12 @@ public class JwtUtil {
 
     public static SecretKey secretKey = Keys.hmacShaKeyFor("MGRy8GUfKmub2aVHWA7HS6NQuUJHrDRg".getBytes());
 
+    /** token 有效期：30 天（开发环境避免频繁重新登录） */
+    private static final long TOKEN_TTL_MILLIS = 30L * 24 * 3600 * 1000;
+
     public static String createToken(Long userId,String username){
         String jwt = Jwts.builder().
-                setExpiration(new Date(System.currentTimeMillis() + 3600000)).
+                setExpiration(new Date(System.currentTimeMillis() + TOKEN_TTL_MILLIS)).
                 setSubject(username).
                 claim("userId",userId).
                 claim("username",username).

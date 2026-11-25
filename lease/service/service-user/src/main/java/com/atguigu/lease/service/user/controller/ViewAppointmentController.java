@@ -1,5 +1,6 @@
 package com.atguigu.lease.service.user.controller;
 
+import com.atguigu.lease.common.login.LoginUserHolder;
 import com.atguigu.lease.common.result.Result;
 import com.atguigu.lease.model.entity.ViewAppointment;
 import com.atguigu.lease.model.enums.AppointmentStatus;
@@ -24,7 +25,7 @@ public class ViewAppointmentController {
     private ViewAppointmentService viewAppointmentService;
 
     @GetMapping("page")
-    @Operation(summary = "分页查询预约信息")
+    @Operation(summary = "分页查询预约信息（管理端）")
     public Result<Page<AppointmentVo>> page(@RequestParam long current, @RequestParam long size, AppointmentQueryVo queryVo) {
         Page<AppointmentVo> page = new Page<>(current, size);
         return Result.ok((Page<AppointmentVo>) viewAppointmentService.pageAppointment(page, queryVo));
@@ -40,12 +41,23 @@ public class ViewAppointmentController {
     @PostMapping("saveOrUpdate")
     @Operation(summary = "保存或更新看房预约")
     public Result saveOrUpdate(@RequestBody ViewAppointment viewAppointment) {
+        Long userId = LoginUserHolder.getLoginUser().getUserId();
+        if (viewAppointment.getUserId() == null) {
+            viewAppointment.setUserId(userId);
+        }
         viewAppointmentService.saveOrUpdate(viewAppointment);
         return Result.ok();
     }
 
+    @GetMapping("listItem")
+    @Operation(summary = "查询当前登录用户的预约看房列表")
+    public Result<List<AppointmentItemVo>> listItem() {
+        Long userId = LoginUserHolder.getLoginUser().getUserId();
+        return Result.ok(viewAppointmentService.listItemByUserId(userId));
+    }
+
     @GetMapping("listItemByUserId")
-    @Operation(summary = "查询个人预约看房列表")
+    @Operation(summary = "查询指定用户的预约看房列表（管理端）")
     public Result<List<AppointmentItemVo>> listItemByUserId(@RequestParam Long userId) {
         return Result.ok(viewAppointmentService.listItemByUserId(userId));
     }
@@ -53,6 +65,12 @@ public class ViewAppointmentController {
     @GetMapping("getById")
     @Operation(summary = "根据ID查询预约信息")
     public Result<ViewAppointment> getById(@RequestParam Long id) {
+        return Result.ok(viewAppointmentService.getById(id));
+    }
+
+    @GetMapping("getDetailById")
+    @Operation(summary = "根据ID查询预约详情（前端对齐）")
+    public Result<ViewAppointment> getDetailById(@RequestParam Long id) {
         return Result.ok(viewAppointmentService.getById(id));
     }
 }

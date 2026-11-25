@@ -40,5 +40,13 @@
             <artifactId>jjwt-jackson</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- HeaderAuthInterceptor 需要 Servlet 与 HandlerInterceptor 接口，
+             scope=provided 避免把完整 starter 塞给不使用 Web 的上层模块 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>
