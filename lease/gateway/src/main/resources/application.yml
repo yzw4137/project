@@ -7,7 +7,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 192.168.100.101:8848
+        server-addr: ${NACOS_HOST:192.168.100.101}:${NACOS_PORT:8848}
     gateway:
       routes:
         # ===== service-user：登录/验证码（不 StripPrefix，路径原样保留给后端区分 app vs admin）=====

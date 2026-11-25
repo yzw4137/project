@@ -1,0 +1,1 @@
+import{h as a}from"./index-1b066223.js";function r(){return a.get("/app/message/overview")}function g(e){return a.get("/app/message/pageItem",e)}function s(e){return a.post("/app/message/read",e)}function n(e){return s({type:e})}export{g as a,n as b,r as g,s as m};
